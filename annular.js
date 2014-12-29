@@ -1,32 +1,9 @@
 
 ;(function(){
-  var annular, container
+  var annular
 
-  container = new CrossTalk.Binding([])
-
-  Annular.prototype.controllers = {}
-  Annular.prototype.container = new CrossTalk.Binding([])
-  Annular.prototype.controller = function controller(name, constructor){
-    var self = new Controller()
-
-    self.models = container.bindable
-
-    constructor.apply(self)
-    widgetBuilder.apply(self)
-
-    self.controllers[name] = self
-
-    var html = generateHtml.apply(self)
-    for (var i in html)
-      document.querySelector('#body').appendChild(html[i])
-  }
-
-  Controller.prototype = new Annular()
   window.annular = annular = new Annular()
 
-
-  function Annular(){}
-  function Controller(){}
 
 
   /* Template parsing algorithm */
@@ -90,6 +67,8 @@
   }
 
 
+  /* Takes a CSS selector-style string and generates corresponding real DOM element. */
+
   function htmlFromDesc(desc){
     var el=null, tag='', id='', classes=[], type='', regex=null, matches=null
 
@@ -123,21 +102,6 @@
     return el
   }
 
-
-  function widgetBuilder(){
-    var fn, el, self
-
-    self = this
-
-    for (var name in this.widgets) {
-      el = new ElementWrapper()
-      el.models = this.models
-      fn = this.widgets[name]
-      fn.apply(el)
-
-      this.widgets[name] = el
-    }
-  }
 
 
   /*
@@ -188,5 +152,32 @@
     , set:function(val){this._el.value = val}
     }
   })
+
+
+
+  function Annular(){
+    this._container = new CrossTalk.Binding([])
+    this.models = this._container.bindable
+  }
+  Annular.prototype.controllers = {}
+  Annular.prototype.controller = function(name, constructor){
+
+    annular.controllers[name] = constructor
+
+    constructor.apply(this)
+
+    for (var name in this.widgets) {
+      el = new ElementWrapper()
+      el.models = this.models
+      fn = this.widgets[name]
+      fn.apply(el)
+
+      this.widgets[name] = el
+    }
+
+    var html = generateHtml.apply(this)
+    for (var i in html)
+      document.querySelector('#body').appendChild(html[i])
+  }
 
 })()

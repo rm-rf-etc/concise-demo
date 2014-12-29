@@ -108,26 +108,6 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
 
 
-  function renderAsHtml(bindable){
-    // if (typeOf(bindable) !== 'BindableObject' && typeOf(bindable) !== 'BindableArray') return 'Not binadable.'
-    var html = ''
-
-    each(bindable[0], function(key, val){
-      if (validNode(val))
-        html += '<'+val.tag+'>'+val.inner+'</'+val.tag+'>\n'
-    })
-
-    return html
-  }
-  var validTags = ['div','h1','li','a','p','p']
-  function validNode(d){
-    if (d && d.hasOwnProperty('tag') && d.hasOwnProperty('inner') && validTags.indexOf(d.tag) !== false) {
-      return true
-    }
-  }
-
-
-
   /* Inverts control: Allows inputs to block update events when they are the sender. */
 
   function blockify(setup_input, setup_output){
@@ -195,7 +175,6 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
   var CrossTalk = {
     Binding: BindableContainer
-  , render: renderAsHtml
   , addForm: addForm
   , inputManager: blockify
   , takeId: function(cb){ _ct.send_id = cb }
