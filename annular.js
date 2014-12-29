@@ -139,6 +139,9 @@
   ElementWrapper.prototype.onchange = function(fn){
     this._el.addEventListener('input',function(ev){fn.call(this,ev)})
   }
+  ElementWrapper.prototype.onsubmit = function(fn){
+    this._el.addEventListener('submit',function(ev){fn.call(this,ev)})
+  }
   ElementWrapper.prototype.onclick = function(fn){
     this._el.addEventListener('click',function(ev){fn.call(this,ev)})
   }

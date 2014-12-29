@@ -25,31 +25,35 @@
     var self = this
     var models = this.models
     var list = this.models.list
-    // console.log(items)
+    console.log('DATA', list)
 
     this.el('div.list-editor',function(){
+      this.el('form',function(){
+        this.el('input[type="text"]')
+        this.el('input[type="submit"]')
+        this.onsubmit(function(ev){
+          ev.preventDefault()
+          console.log(this.children[0].value)
+          list.push({checked:false, text:this.children[0].value})
+        })
+      })
       this.el('ul',function(){
         this.each(models,'list',function(id,item){
           this.el('li',listObject(self,list,id,item))
         })
       })
-      // this.el('button#add',function(){
-      //   this.innerHTML = '+'
-      //   this.onclick(function(){
-      //     models.list.items.push( {checked:false, text:''})
-      //   })
-      // })
-      // this.el('button#delete',function(){
-      //   this.innerHTML = 'x'
-      //   this.each(models.list,'items',function(id,item){
-      //     if (item.checked) items.splice( item, 1 )
-      //   })
-      // })
+      this.el('button#delete.right',function(){
+        this.innerHTML = 'clear completed'
+        this.onclick(function(){
+          self.each(models,'list',function(id,item){
+            if (this.checked) models.list.splice( models.list.indexOf(item), 1 )
+          })
+        })
+      })
     })
   }
 
   function listObject(self,list,id,item){
-    // console.log(id, item)
 
     return function(){
       this.el('input[type="checkbox"]',function(){
