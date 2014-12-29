@@ -1,71 +1,79 @@
 
-annular.controller('home',function(){
+;(function(){
 
-  this.models._new_property_ = ['list', {items: []}]
-  this.models._new_property_ = ['test', 1234567890]
+  annular.controller('home',function(){
 
-  this.template = "\n\
-  div.small-6.columns\n\
-    {to-do}"
+    var list_of_items = [
+      {checked:false, text:'buy almond milk'}
+    , {checked:false, text:'schedule dentist appointment'}
+    , {checked:false, text:'breakup with Katey'}
+    ]
 
-  this.widgets = {
-    "to-do": to_do
-  }
-})
+    this.models._new_property_ = ['list', list_of_items]
 
-function to_do(){
-  var self = this
+    this.template = "\n\
+    div.width-6.columns.centered\n\
+      {to-do}"
 
-  this.add('div.special',function(){
-    this.add('ul',function(){
-      this.add('button',function(){
-        this.innerHTML = 'Click on me.'
-        this.onclick(function(){
-          alert('Proof of concept: '+self.models.test)
+    this.widgets = {
+      "to-do": to_do
+    }
+  })
+
+
+  function to_do(){
+    var self = this
+    var models = this.models
+    var list = this.models.list
+    // console.log(items)
+
+    this.el('div.list-editor',function(){
+      this.el('ul',function(){
+        this.each(models,'list',function(id,item){
+          this.el('li',listObject(self,list,id,item))
         })
       })
+      // this.el('button#add',function(){
+      //   this.innerHTML = '+'
+      //   this.onclick(function(){
+      //     models.list.items.push( {checked:false, text:''})
+      //   })
+      // })
+      // this.el('button#delete',function(){
+      //   this.innerHTML = 'x'
+      //   this.each(models.list,'items',function(id,item){
+      //     if (item.checked) items.splice( item, 1 )
+      //   })
+      // })
     })
-  })
-}
-// function to_do(models){
-//   var items = models.list.items
-//   this.add('div',function(){
-//     this.add('ul',function(){
-//       this.each(models.list,'items',function(id,item){
+  }
 
-//         this.add('li',function(){
-//           this.add('input[type="checkbox"]',function(){
-//             this.onchange(function(ev){
-//               item.checked = ev.target.value
-//             })
-//           })
-//           this.add('button',function(){
-//             this.value = 'X'
-//             this.onclick(function(){
-//               if (window.confirm('Delete this item?'))
-//                 items.splice( items.indexOf(self), 1 )
-//             })
-//           })
-//           this.add('input[type="text"]',function(){
-//             this.value = val
-//             this.onchange(function(ev){
-//               item.value = ev.target.value
-//             })
-//           })
-//         })
+  function listObject(self,list,id,item){
+    // console.log(id, item)
 
-//       })
-//     })
-//     this.add('button',function(){
-//       this.value = '+'
-//       this.onclick(function(){
-//         models.list.items.push( new this.NewModels.Item() )
-//       })
-//     })
-//     this.add('button',function(){
-//       this.each(models.list,'items',function(id,item){
-//         if (item.checked) items.splice( item, 1 )
-//       })
-//     })
-//   })
-// }
+    return function(){
+      this.el('input[type="checkbox"]',function(){
+        this.onclick(function(ev){
+          item.checked = this.checked
+          console.log(item)
+        })
+      })
+      this.el('button.delete-this',function(){
+        this.innerHTML = 'x'
+        this.onclick(function(){
+          if (window.confirm('Delete this item?'))
+            list.splice( list.indexOf(self), 1 )
+        })
+      })
+      this.el('input[type="text"]',function(){
+        this.value = item.text
+        this.onchange(function(ev){
+          item.text = ev.target.value
+          console.log(item)
+        })
+      })
+    }
+
+  }
+
+})();

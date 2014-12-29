@@ -13,7 +13,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   /*  Private Class Data  */
 
   var DEFINE = Object.defineProperty
-  var ID_GETTER_KEY = 7203445781487972
+  var ID_GETTER_KEY = {}
 
   var _bindables = []
   var _events = new MicroEvent()

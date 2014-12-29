@@ -91,7 +91,7 @@
 
 
   function htmlFromDesc(desc){
-    var el=null, tag='', id='', classes=[], regex=null, matches=null
+    var el=null, tag='', id='', classes=[], type='', regex=null, matches=null
 
     if (/{[\w-]+}/g.test(desc))
       throw new Error("htmlFromDesc() received a widget identifier.")
@@ -101,6 +101,8 @@
 
     if (! /^\w/g.test(desc))
       throw new Error("Descriptor doesn't begin with a tag name: "+desc)
+
+    type = /^\w+\[type=["'](\w+)["']\]/g.test(desc) ? (/^\w+\[type=["'](\w+)["']\]/g).exec(desc)[1] : null
 
     tag = /^(\w+)/g.exec(desc)[1]
 
@@ -115,6 +117,8 @@
       el.className = classes.join(' ')
     if (id)
       el.id = id
+    if (type)
+      el.type = type
 
     return el
   }
@@ -125,30 +129,6 @@
 
     self = this
 
-    function ElementWrapper(el){
-      this._el = el
-    }
-    ElementWrapper.prototype.appendChild = function appendChild(el){
-      this._el.appendChild(el)
-    }
-    ElementWrapper.prototype.add = function add(el_string,fn){
-      var el = htmlFromDesc(el_string)
-      var wrapped = new ElementWrapper(el)
-      if (fn) fn.apply(wrapped)
-      this._el.appendChild(el)
-      return wrapped
-    }
-    ElementWrapper.prototype.onclick = function onclick(fn){
-      this._el.addEventListener('click',function(ev){ev.preventDefault(); fn(ev)})
-    }
-    Object.defineProperties(ElementWrapper.prototype,{
-      innerHTML: {
-        set:function(val){this._el.innerHTML = val}
-      , get:function(){return this._el.innerHTML}
-      }
-    })
-
-
     for (var name in this.widgets) {
       el = new ElementWrapper(document.createElement('div'))
       el.models = this.models
@@ -158,5 +138,50 @@
       this.widgets[name] = el
     }
   }
+
+
+  /*
+
+  Classes
+
+  */
+
+  function ElementWrapper(el){
+    this._el = el
+  }
+  ElementWrapper.prototype.appendChild = function(el){
+    this._el.appendChild(el)
+  }
+  ElementWrapper.prototype.el = function(el_string,fn){
+    var el = htmlFromDesc(el_string)
+    var wrapped = new ElementWrapper(el)
+    if (fn) fn.apply(wrapped)
+    this._el.appendChild(el)
+    return wrapped
+  }
+  ElementWrapper.prototype.each = function(obj,prop,fn){
+    var keys, key
+    keys = Object.keys(obj[prop][0])
+    for (var i in keys) {
+      key = keys[i]
+      fn.call(this,key,obj[prop][0][key])
+    }
+  }
+  ElementWrapper.prototype.onchange = function(fn){
+    this._el.addEventListener('input',function(ev){fn.call(this,ev)})
+  }
+  ElementWrapper.prototype.onclick = function(fn){
+    this._el.addEventListener('click',function(ev){fn.call(this,ev)})
+  }
+  Object.defineProperties(ElementWrapper.prototype,{
+    innerHTML: {
+      get:function(){return this._el.innerHTML}
+    , set:function(val){this._el.innerHTML = val}
+    }
+    , value: {
+      get:function(){return this._el.value}
+    , set:function(val){this._el.value = val}
+    }
+  })
 
 })()
