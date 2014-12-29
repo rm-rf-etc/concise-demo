@@ -70,7 +70,7 @@
   /* Takes a CSS selector-style string and generates corresponding real DOM element. */
 
   function htmlFromDesc(desc){
-    var el=null, tag='', id='', classes=[], type='', regex=null, matches=null
+    var el=null, tag='', id='', classes=[], type='', regex=null, matches=true, properties={}, props=''
 
     if (/{[\w-]+}/g.test(desc))
       throw new Error("htmlFromDesc() received a widget identifier.")
@@ -81,7 +81,9 @@
     if (! /^\w/g.test(desc))
       throw new Error("Descriptor doesn't begin with a tag name: "+desc)
 
-    type = /^\w+\[type=["'](\w+)["']\]/g.test(desc) ? (/^\w+\[type=["'](\w+)["']\]/g).exec(desc)[1] : null
+    regex = /\[(\w+)=["'](\w+)["']\]/g
+    while (matches = regex.exec(desc))
+      properties[matches[1]] = matches[2]
 
     tag = /^(\w+)/g.exec(desc)[1]
 
@@ -96,8 +98,12 @@
       el.className = classes.join(' ')
     if (id)
       el.id = id
-    if (type)
-      el.type = type
+
+    var props = Object.keys(properties)
+    for (var i in props) {
+      var prop = props[i]
+      el[prop] = properties[prop]
+    }
 
     return el
   }

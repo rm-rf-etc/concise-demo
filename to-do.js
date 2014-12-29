@@ -25,16 +25,15 @@
     var self = this
     var models = this.models
     var list = this.models.list
-    console.log('DATA', list)
 
     this.el('div.list-editor',function(){
       this.el('form',function(){
-        this.el('input[type="text"]')
+        var text_input = this.el('input[type="text"][name="new-item-field"]')
         this.el('input[type="submit"]')
         this.onsubmit(function(ev){
           ev.preventDefault()
-          console.log(this.children[0].value)
-          list.push({checked:false, text:this.children[0].value})
+          console.log(text_input.value)
+          list.push({checked:false, text:text_input.value})
         })
       })
       this.el('ul',function(){
@@ -65,7 +64,7 @@
       this.el('button.delete-this',function(){
         this.innerHTML = 'x'
         this.onclick(function(){
-          if (window.confirm('Delete this item?'))
+          if (confirm('Delete this item?'))
             list.splice( list.indexOf(item), 1 )
         })
       })
