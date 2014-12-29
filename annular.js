@@ -130,7 +130,7 @@
     self = this
 
     for (var name in this.widgets) {
-      el = new ElementWrapper(document.createElement('div'))
+      el = new ElementWrapper()
       el.models = this.models
       fn = this.widgets[name]
       fn.apply(el)
@@ -147,7 +147,8 @@
   */
 
   function ElementWrapper(el){
-    this._el = el
+    this._el = el || null
+    this._is_parent = !el
   }
   ElementWrapper.prototype.appendChild = function(el){
     this._el.appendChild(el)
@@ -156,7 +157,11 @@
     var el = htmlFromDesc(el_string)
     var wrapped = new ElementWrapper(el)
     if (fn) fn.apply(wrapped)
-    this._el.appendChild(el)
+    if (this._is_parent) {
+      if (! this._el) this._el = el
+      else throw new Error("Cannot invoke this.el() more than once in the widget parent scope. Must have only one parent DOM element per widget.")
+    }
+    else this._el.appendChild(el)
     return wrapped
   }
   ElementWrapper.prototype.each = function(obj,prop,fn){
