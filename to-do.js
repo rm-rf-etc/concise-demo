@@ -62,7 +62,7 @@
         this.innerHTML = 'x'
         this.onclick(function(){
           if (window.confirm('Delete this item?'))
-            list.splice( list.indexOf(self), 1 )
+            list.splice( list.indexOf(item), 1 )
         })
       })
       this.el('input[type="text"]',function(){
