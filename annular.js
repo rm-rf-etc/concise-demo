@@ -9,7 +9,7 @@
   /* Template parsing algorithm */
 
   function generateHtml(){
-    var lines = this.template.split('\n')
+    var lines = this.view.split('\n')
     var line, opening_indent_length, opening_indent_string, spaces, curr_level, prev_level, path, els, el, widget
 
     for (var i in lines) {
@@ -25,19 +25,19 @@
     prev_level = 1
     for (var i in lines) {
       if (lines[i].slice(0,opening_indent_length*2) !== opening_indent_string)
-        throw new Error('Invalid indentation in template string. Subsequent indents must not un-indent to lower than opening indent: '+lines[i])
+        throw new Error('Invalid indentation in view template. Subsequent indents must not un-indent to lower than opening indent: '+lines[i])
 
       line = lines[i].replace(opening_indent_string,'')
       curr_level = /\s\s/g.test(line) ? line.match(/\s\s/g).length+1 : 1
 
       if (line.match(/\s\n?$/g))
-        throw new Error('Invalid indentation in template string. Trailing white space found: '+line)
+        throw new Error('Invalid indentation in view template. Trailing white space found: '+line)
 
       if (line.match(/\s/g) && line.match(/\s/g).length % 2)
-        throw new Error('Invalid indentation in template string. Indented odd number of spaces: '+line)
+        throw new Error('Invalid indentation in view template. Indented odd number of spaces: '+line)
 
       if (prev_level+1 < curr_level)
-        throw new Error('Invalid indentation in template string: '+line)
+        throw new Error('Invalid indentation in view template: '+line)
 
       if (/{[\w-]+}/g.test(line)) {
         widget = this.widgets[ /{([\w-]+)}/g.exec(line)[1] ]
