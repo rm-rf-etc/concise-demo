@@ -11,8 +11,8 @@
   */
 
   function Annular(){
-    this._container = new CrossTalk.Binding({})
-    this.models = this._container.bindable
+    this.modelHandler = new CrossTalk.Binding({})
+    this.models = this.modelHandler.bindable
     this.helpers = {
       each: function(obj,fn){
         var keys = Object.keys(obj)

@@ -47,15 +47,23 @@
           'button.delete-this':function(){
             this.innerHTML = 'x'
             this.addEventListener('click',function(){
-              if (confirm('Delete this item?'))
-                list.splice( list.indexOf(item), 1 )
+              // if (confirm('Delete this item?')) list.splice( list.indexOf(item), 1 )
+              console.log( item )
             })
           },
           'input[type="text"]':function(){
+            var field = this
             this.value = item.text
-            this.addEventListener('input',function(ev){
-              item.text = ev.target.value
-              console.log(item)
+
+            CrossTalk.fieldManager(function(input_handler, output_handler){
+
+              this.addEventListener('input',function(ev){
+                input_handler(function(){ item.text = field.value })
+              })
+              annular.modelHandler.bind(item,'text',function(val){
+                output_handler(function(){ field.value = val })
+              })
+
             })
           }
         }
