@@ -19,40 +19,41 @@
 
   function todoWidget(){
     var self = this
-    var models = this.models
-    var list = this.models.list
+    var models = annular.models
+    var list = annular.models.list
 
     this.dom = {
       'div.list-editor':{
         'form':function(){
           var text_input
           this.dom = {'input[type="text"][name="new-item-field"]':function(){ text_input = this }}
-          this.dom = {'input[type="submit"]':null}
+          this.dom = {'input[type="submit"]':0}
           function onSubmit(ev){
             ev.preventDefault()
-            list.push({checked:false, text:text_input.value})
+            console.log(text_input.value)
+            // list.push({checked:false, text:text_input.value})
           }
-          this.onsubmit(onSubmit)
+          this.addEventListener('submit',onSubmit)
         }
       },
-      'ul::each(models.list)':function(id,item){ this.dom = {
+      'ul each(models.list)':function(id,item){ this.dom = {
         'li':{
           'input[type="checkbox"]':function(){
-            this.onclick(function(ev){
+            this.addEventListener('click',function(ev){
               item.checked = this.checked
               console.log(item)
             })
           },
           'button.delete-this':function(){
             this.innerHTML = 'x'
-            this.onclick(function(){
+            this.addEventListener('click',function(){
               if (confirm('Delete this item?'))
                 list.splice( list.indexOf(item), 1 )
             })
           },
           'input[type="text"]':function(){
             this.value = item.text
-            this.onchange(function(ev){
+            this.addEventListener('input',function(ev){
               item.text = ev.target.value
               console.log(item)
             })
@@ -61,7 +62,7 @@
       }},
       'button#delete.right':function(){
         this.innerHTML = 'clear completed'
-        this.onclick(function(){
+        this.addEventListener('click',function(){
           self.each(models,'list',function(id,item){
             if (this.checked) models.list.splice( models.list.indexOf(item), 1 )
           })

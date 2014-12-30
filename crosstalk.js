@@ -35,28 +35,27 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
   function BindableObject(data){
     DEFINE(this, '_new_property_', { enumerable:false, configurable:false,
-      set:function(keyval){ this.addProperty(keyval[0], keyval[1]) }
+      set:function(keyval){ addProperty.apply(this, keyval) }
     })
     for (var prop in data) {
       if (data.hasOwnProperty(prop)) this._new_property_ = [prop, data[prop]]
     }
   }
-  DEFINE(BindableObject.prototype, 'addProperty', {enumerable:false, value:addProperty})
 
 
-  function BindableArray(data){
-    var self = Array.prototype.slice.apply(arguments)
+  function BindableArray(){
+    var args = Array.prototype.slice.apply(arguments)[0]
+    var self = []
 
     DEFINE(self, '_new_property_', { enumerable:false, configurable:false,
-      set:function(keyval){ addProperty.call(self, keyval[0], keyval[1]) }
+      set:function(keyval){ addProperty.apply(self, keyval) }
     })
-    for (var i in data) {
-      if (data.hasOwnProperty(i)) this._new_property_ = [i, data[i]]
+    for (var i in args) {
+      if (args.hasOwnProperty(i)) self._new_property_ = [i, args[i]]
     }
 
     return self
   }
-  DEFINE(BindableArray.prototype, 'addProperty', {enumerable:false, value:addProperty})
 
 
   function addProperty(key, val){
@@ -71,7 +70,6 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         else { _val = value; _ct.setter_cb(_id, value) }
       }
     })
-
     if (familyOf(val) === 'complex') val = new Bindable(val)
     this[key] = val
   }
@@ -83,37 +81,44 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   function addForm(form, container){
     var bindable = container.bindable
 
-    ;[].forEach.call(form.querySelectorAll('input'), formFieldInitializer)
+    ;[].forEach.call(form.querySelectorAll('input'), function(field){
 
-    function formFieldInitializer(field){
+      if (field.name in bindable) {
+        CrossTalk.fieldManager(function(input_handler, output_handler){
 
-      function setup_input(notify){
-        function eventHandler(ev){
-          notify(function(){ bindable[field.name] = ev.target.value })
-        }
-        field.addEventListener('input', eventHandler)
+          field.addEventListener('input', function(ev){
+            var do_it = function(){ bindable[field.name] = ev.target.value }
+            input_handler( do_it )
+          })
+
+          container.bind(bindable, field.name, function(val){
+            var do_it = function(){ field.value = val }
+            output_handler( do_it )
+          })
+
+        })
+
+        field.value = bindable[field.name]
       }
 
-      function setup_output(notify){
-        function eventHandler(val){
-          notify(function(){ field.value = val })
-        }
-        container.bind(bindable, field.name, eventHandler)
-      }
-
-      CrossTalk.inputManager( setup_input, setup_output )
-      field.value = bindable[field.name]
-    }
+    })
   }
 
 
 
-  /* Inverts control: Allows inputs to block update events when they are the sender. */
+  /* Inverts control: Prevents inputs from receiving updates while they are the sender. */
 
-  function blockify(setup_input, setup_output){
-    var sender = false
-    setup_input(function(run){ sender = true; run() })
-    setup_output(function(run){ if (! sender) run(); sender = false })
+  function fieldManager(receive_handlers){
+    var _sent_by_me = false
+
+    function input_handler(do_it){
+      _sent_by_me = true
+      do_it()
+    }
+    function output_handler(do_it){
+      _sent_by_me ? _sent_by_me = false : do_it()
+    }
+    receive_handlers( input_handler, output_handler )
   }
 
 
@@ -126,13 +131,8 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
     _data = new Bindable(data)
 
-    this.bind = function(parent, property, setter_cb){
-      CrossTalk.takeId(function(id){ _events.bind(id, setter_cb) })
-      parent[property] = ID_GETTER_KEY
-    }
-    this.unbind = function(property, setter_cb){
-      _events.unbind(setter_cb)
-    }
+    this.bind = bind
+    this.unbind = unbind
     this.recompute = function(data){
       if (familyOf(data) === 'complex')
         _data = new Bindable(data)
@@ -141,6 +141,13 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     DEFINE(this, 'bindable', {get:function(){return _data}, enumerable:true, configurable:false})
 
     _bindables.push(_data)
+  }
+  function bind(parent, property, setter_cb){
+    CrossTalk.takeId(function(id){ _events.bind(id, setter_cb) })
+    parent[property] = ID_GETTER_KEY
+  }
+  function unbind(property, setter_cb){
+    _events.unbind(setter_cb)
   }
 
 
@@ -155,8 +162,8 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
       , Number: 'simple'
       , Boolean: 'simple'
       , Function: 'simple'
-      , Object: 'complex'
       , Array: 'complex'
+      , Object: 'complex'
       }[typeOf(thing)] || 'complex'
     } else {
       return false
@@ -164,19 +171,23 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   }
 
   function typeOf(thing){
-    return (thing != null && !Number.isNaN(thing) && thing.constructor) ? thing.constructor.name : null
+    return (thing != null && !Number.isNaN(thing) && thing.constructor) ? thing.constructor.name : '' + thing
   }
 
   function each(obj, cb){
-    for (var prop in obj) cb(prop, obj[prop])
+    // if (typeOf(obj) === 'BindableObject' || typeOf(obj) === 'BindableArray')
+    //   obj = obj
+
+    for (var prop in obj)
+      cb(prop, obj[prop])
   }
 
 
 
   var CrossTalk = {
     Binding: BindableContainer
+  , fieldManager: fieldManager
   , addForm: addForm
-  , inputManager: blockify
   , takeId: function(cb){ _ct.send_id = cb }
   }
   DEFINE(CrossTalk, 'bindables', {get:function(){return _bindables}, enumerable: true})
