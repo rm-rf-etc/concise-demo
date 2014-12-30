@@ -11,12 +11,8 @@
 
     this.models._new_property_ = ['list', list_of_items]
 
-    this.view = "\n\
-    div.width-6.columns.centered\n\
-      {to-do}"
-
-    this.widgets = {
-      "to-do": todoWidget
+    this.dom = {
+      'div.width-6.columns.centered':todoWidget
     }
   })
 
@@ -26,61 +22,51 @@
     var models = this.models
     var list = this.models.list
 
-    this.el('div.list-editor',function(){
-      this.el('form',function(){
-        var text_input = this.el('input[type="text"][name="new-item-field"]')
-        this.el('input[type="submit"]')
-        this.onsubmit(function(ev){
-          ev.preventDefault()
-          list.push({checked:false, text:text_input.value})
-        })
-      })
-
-      this.el('ul',function(){
-        this.each(models,'list',function(id,item){
-          this.el('li',listObject(self,list,id,item))
-        })
-      })
-
-      this.el('button#delete.right',function(){
+    this.dom = {
+      'div.list-editor':{
+        'form':function(){
+          var text_input
+          this.dom = {'input[type="text"][name="new-item-field"]':function(){ text_input = this }}
+          this.dom = {'input[type="submit"]':null}
+          function onSubmit(ev){
+            ev.preventDefault()
+            list.push({checked:false, text:text_input.value})
+          }
+          this.onsubmit(onSubmit)
+        }
+      },
+      'ul::each(models.list)':function(id,item){ this.dom = {
+        'li':{
+          'input[type="checkbox"]':function(){
+            this.onclick(function(ev){
+              item.checked = this.checked
+              console.log(item)
+            })
+          },
+          'button.delete-this':function(){
+            this.innerHTML = 'x'
+            this.onclick(function(){
+              if (confirm('Delete this item?'))
+                list.splice( list.indexOf(item), 1 )
+            })
+          },
+          'input[type="text"]':function(){
+            this.value = item.text
+            this.onchange(function(ev){
+              item.text = ev.target.value
+              console.log(item)
+            })
+          }
+        }
+      }},
+      'button#delete.right':function(){
         this.innerHTML = 'clear completed'
         this.onclick(function(){
           self.each(models,'list',function(id,item){
             if (this.checked) models.list.splice( models.list.indexOf(item), 1 )
           })
         })
-      })
-
-    })
-  }
-
-  function listObject(self,list,id,item){
-
-    return function(){
-
-      this.el('input[type="checkbox"]',function(){
-        this.onclick(function(ev){
-          item.checked = this.checked
-          console.log(item)
-        })
-      })
-
-      this.el('button.delete-this',function(){
-        this.innerHTML = 'x'
-        this.onclick(function(){
-          if (confirm('Delete this item?'))
-            list.splice( list.indexOf(item), 1 )
-        })
-      })
-
-      this.el('input[type="text"]',function(){
-        this.value = item.text
-        this.onchange(function(ev){
-          item.text = ev.target.value
-          console.log(item)
-        })
-      })
-
+      }
     }
 
   }
