@@ -52,21 +52,25 @@ THE SOFTWARE.
           var text_input
           this.dom = {'input[type="text"][name="new-item-field"]':function(){ text_input = this }}
           this.dom = {'input[type="submit"]':0}
-          function onSubmit(ev){
+          this.addEventListener('submit',function(ev){
             ev.preventDefault()
             console.log(text_input.value)
             // list.push({checked:false, text:text_input.value})
-          }
-          this.addEventListener('submit',onSubmit)
+          })
         }
       },
-      'ul each(models.list)':function(id,item){ this.dom = {
+      'ul each(models.list)':function(name,item){ this.dom = {
         'li':{
           'input[type="checkbox"]':function(){
+
+            annular.modelHandler.bind(item,'checked',function(val){
+              this.checked = item.checked
+            }.bind(this))
+
             this.addEventListener('click',function(ev){
               item.checked = this.checked
-              console.log(item)
-            })
+            }.bind(this))
+
           },
           'button.delete-this':function(){
             this.innerHTML = 'x'

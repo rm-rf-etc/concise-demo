@@ -38,13 +38,31 @@ THE SOFTWARE.
     this.modelHandler = new CrossTalk.Binding({})
     this.models = this.modelHandler.bindable
     this.helpers = {
-      each: function(obj,fn){
-        var keys = Object.keys(obj)
-        for (var i in keys) {
-          var key = keys[i]
-          // console.log('EACH', this, key, obj[key])
-          fn.call(this, key, obj[key])
-        }
+      each: function(data,constructor){
+        var parent = this
+
+        Object.keys(data).map(function(key){
+          var construct = function(key, val){
+            if (typeOf(constructor) === 'Function')
+              constructor.call(parent, key, val)
+            else if (typeOf(constructor) === 'Object')
+              parent.dom = constructor
+          }
+
+          construct.call(this, data, data[key])
+
+          ;(function(child){
+            annular.modelHandler.bind(data,key,function(val){
+              console.log('HANDLER',child)
+              child.mode = 'match'
+              construct.call(parent,data,key)
+            })
+          })(parent.lastChild)
+
+        })
+
+        parent.mode = 'match'
+
       }
     }
   }
@@ -66,10 +84,16 @@ THE SOFTWARE.
 
 
   function attachDomMethod(obj){
+    var mode = 'build'
     Object.defineProperty(obj,'dom',{enumerable:false, configurable:false, set:domBuilder})
+    Object.defineProperty(obj,'mode',{enumerable:false, configurable:false,
+      get:function(){ return mode }
+    , set:function(v){ mode = (v === 'match') ? v : 'build' }
+    })
   }
   function domBuilder(obj){
-    var helper, keys, key, val, dom_n_helper, name, args, el
+    var helper, keys, key, val, el_and_helper, name, data, el
+    if (this.mode === 'match') { console.log('CHECKING',key,this); return }
 
     keys = Object.keys(obj)
     for (var i in keys) {
@@ -78,41 +102,47 @@ THE SOFTWARE.
 
       helper = null
       if (/\s/g.test(key)) {
-        dom_n_helper = key.split(' ')
-        if (dom_n_helper.length > 2)
+        el_and_helper = key.split(' ')
+        if (el_and_helper.length > 2)
           throw new Error('Invalid DOM object definition. Cannot have more than one space character.')
-        helper = dom_n_helper[1]
-        key = dom_n_helper[0]
+        helper = el_and_helper[1]
+        key = el_and_helper[0]
       }
-      el = elFromString(key)
 
-      if (! val) {
-        this.appendChild(el)
-      }
-      else if (helper) {
-        if (typeOf(val) !== 'Function')
-          throw new Error('DOM object defined with helper method but has no function upon which to apply it.')
-        attachDomMethod(el)
+      if (this.mode === 'build') el = elFromString(key)
+      else el = this.querySelector(key)
+
+      el.mode = this.mode
+
+      if (! val) childAction.call(this)
+
+      if (helper) {
+        // if (typeOf(val) !== 'Function')
+        //   throw new Error('DOM object defined with helper method but has no function upon which to apply it.')
+        if (val) attachDomMethod(el)
 
         name = /(\w+)/g.exec(helper)[1]
-        args = /\((.+)\)/g.exec(helper)[1]
+        data = /\((.+)\)/g.exec(helper)[1]
 
-        args = args.split('.').reduce(function(data, prop, idx){
-          return data[prop]
+        data = data.split('.').reduce(function(_data, prop, idx){
+          return _data[prop]
         },annular)
 
         helper = annular.helpers[name]
-        helper.call(el,args,val)
-        this.appendChild(el)
+        helper.call(el,data,val)
+        childAction.call(this)
       }
       else if (typeOf(val) === 'Object') {
         domBuilder.call(el,val)
-        this.appendChild(el)
+        childAction.call(this)
       }
       else if (typeOf(val) === 'Function') {
-        attachDomMethod(el)
+        if (this.mode === 'build') attachDomMethod(el)
         val.call(el)
-        this.appendChild(el)
+        childAction.call(this)
+      }
+      function childAction(){
+        if (this.mode === 'build') this.appendChild(el)
       }
     }
   }
@@ -136,7 +166,7 @@ THE SOFTWARE.
     while (matches = regex.exec(desc))
       properties[matches[1]] = matches[2]
 
-    tag = /^(\w+)/g.exec(desc)[1]
+    tag = /^(h[1-6]|[a-z]+)/g.exec(desc)[1]
 
     id = /#[^.]+/g.test(desc) ? /#([^.]+)/g.exec(desc)[1] : null
 

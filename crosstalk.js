@@ -92,11 +92,18 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
       enumerable: true
     , get: function(){ return _val }
     , set: function(value){
-        if (value === ID_GETTER_KEY) { _ct.send_id(_id) }
-        else { _val = value; _ct.setter_cb(_id, value) }
+        if (value === ID_GETTER_KEY) {
+          _ct.send_id(_id)
+        }
+        else if (familyOf(value) === 'complex') {
+          _val = new Bindable(value)
+        }
+        else {
+          _val = value
+        }
+        _ct.setter_cb(_id, _val)
       }
     })
-    if (familyOf(val) === 'complex') val = new Bindable(val)
     this[key] = val
   }
 
