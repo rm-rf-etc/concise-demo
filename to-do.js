@@ -58,8 +58,8 @@ THE SOFTWARE.
           }
           this.addEventListener('submit',function(ev){
             ev.preventDefault()
-            console.log(text_input.value)
-            // list.push({checked:false, text:text_input.value})
+            list.push({checked:false, text:text_input.value})
+            console.log('Item appended:',list)
           })
         }
       },
@@ -67,7 +67,7 @@ THE SOFTWARE.
         'li':{
           'input[type="checkbox"]':function(){
 
-            concise.models.bind(item,'checked',function(val){
+            concise.models.bind([item,'checked'],function(val){
               this.checked = item.checked
             }.bind(this))
 
@@ -92,7 +92,7 @@ THE SOFTWARE.
               field.addEventListener('input',function(ev){
                 input_handler(function(){ item.text = field.value })
               })
-              concise.models.bind(item,'text',function(val){
+              concise.models.bind([item,'text'],function(val){
                 output_handler(function(){ field.value = val })
               })
 

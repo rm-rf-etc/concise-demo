@@ -169,14 +169,18 @@ THE SOFTWARE.
     return {
       each: function(o,data,constructor){
 
+        data.bind( data, function(event){
+          if (event[0] === 'push') constructor.call(o.el, o, event[1], event[2])
+        })
+
         Object.keys(data).map(function(key){
           var maintainer
 
-          if (typeOf(constructor) === 'Function') {
+          if (typeOf(constructor) === 'Function') { //console.log('THE KEY', key)
             constructor.call(o.el, o, key, data[key])
             maintainer = o.maintainer
 
-            concise.models.bind(data, key, function(key,val){
+            concise.models.bind([data, key], function(key,val){
               constructor.call(o.el, maintainer, key, val)
             })
           }
