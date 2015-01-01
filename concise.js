@@ -36,8 +36,8 @@ THE SOFTWARE.
   */
 
   function Concise(){
-    this.holder = new CrossTalk.Binding({})
-    this.models = this.holder.bindable
+    this.models = new CrossTalk.Binding({})
+    // this.models = this.holder.bindable
   }
 
   Concise.prototype.controllers = {}
@@ -55,16 +55,11 @@ THE SOFTWARE.
   }
 
   function DomBuilder(el){
-    this.done = function(cb){ this.cb = cb }
-    this._iterate = false
-    this.children = {}
+    this.just_added = null
     this.el = el
-    // this.maintainer = new DomMaintainer(el)
-    this.maintainer = { dom: {} }
   }
-  DomBuilder.prototype = {
-
-    set dom(structure){
+  DEFINE(DomBuilder.prototype, 'dom', {enumerable:false, configurable:false,
+    set:function(structure){
       if (typeOf(structure) !== 'Object') throw new Error('Invalid dom structure object.')
 
       var helper_fn, helper_str, builder, key, value, name, data, el_str, el, first_time
@@ -95,28 +90,40 @@ THE SOFTWARE.
 
           helper_fn(builder,data,value)
           this.el.appendChild(el)
+          this.just_added = el
         }
         else if (typeOf(value) === 'Object') {
-          this.dom = value
+          builder.dom = value
           this.el.appendChild(el)
+          this.just_added = el
         }
         else if (typeOf(value) === 'Function') {
           value.call(el,builder)
           this.el.appendChild(el)
+          this.just_added = el
         }
 
       }.bind(this))
     }
-  }
+  })
+  DEFINE(DomBuilder.prototype, 'maintainer', {enumerable:false, configurable:false,
+    get:function(){ return new DomMaintainer(this) }
+  })
 
-  function DomMaintainer(){}
-  DomMaintainer.prototype = {
-    set dom(val) {
-      Object.key(val).map(function(key){
-        console.log(key)
-      })
-    }
+
+  function DomMaintainer(builder){
+    this.el = builder.just_added
+    // console.log('DomMaintainer constructor:',this.el)
   }
+  DEFINE(DomMaintainer.prototype, 'dom', {enumerable:false, configurable:false,
+    set:function(struct){
+      console.log('DomMaintainer.dom = ',struct)
+      console.log('this.el',this.el)
+      // Object.keys(struct).map(function(key){
+      //   console.log(key)
+      // })
+    }
+  })
 
 
 
@@ -164,13 +171,18 @@ THE SOFTWARE.
 
   function Helpers(){
     return {
-      each: function(o,data,constructor){ console.log(o)
+      each: function(o,data,constructor){ // console.log('EACH HELPER', o)
 
         Object.keys(data).map(function(key){
+          var maintainer
 
           if (typeOf(constructor) === 'Function') {
             constructor.call(o.el, o, key, data[key])
-            concise.holder.bind(data, key, function(){ constructor.call(o.el, o.maintainer, key, data[key]) })
+            maintainer = o.maintainer
+
+            concise.models.bind(data, key, function(key,val){
+              constructor.call(o.el, maintainer, key, val)
+            })
           }
           else if (typeOf(constructor) === 'Object') {
             o.dom = constructor

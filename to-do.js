@@ -67,7 +67,7 @@ THE SOFTWARE.
         'li':{
           'input[type="checkbox"]':function(){
 
-            concise.holder.bind(item,'checked',function(val){
+            concise.models.bind(item,'checked',function(val){
               this.checked = item.checked
             }.bind(this))
 
@@ -92,7 +92,7 @@ THE SOFTWARE.
               this.addEventListener('input',function(ev){
                 input_handler(function(){ item.text = field.value })
               })
-              concise.holder.bind(item,'text',function(val){
+              concise.models.bind(item,'text',function(val){
                 output_handler(function(){ field.value = val })
               })
 
