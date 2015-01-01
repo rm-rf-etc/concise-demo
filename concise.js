@@ -180,7 +180,7 @@ THE SOFTWARE.
             constructor.call(o.el, o, key, data[key])
             maintainer = o.maintainer
 
-            concise.models.bind([data, key], function(key,val){
+            concise.models.bind(data, key, function(key,val){
               constructor.call(o.el, maintainer, key, val)
             })
           }
