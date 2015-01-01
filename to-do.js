@@ -85,11 +85,11 @@ THE SOFTWARE.
           },
           'input[type="text"]':function(){
             var field = this
-            this.value = item.text
+            field.value = item.text
 
-            CrossTalk.fieldManager(function(input_handler, output_handler){
+            glue.fieldManager(function(input_handler, output_handler){
 
-              this.addEventListener('input',function(ev){
+              field.addEventListener('input',function(ev){
                 input_handler(function(){ item.text = field.value })
               })
               concise.models.bind(item,'text',function(val){

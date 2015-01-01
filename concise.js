@@ -36,8 +36,7 @@ THE SOFTWARE.
   */
 
   function Concise(){
-    this.models = new CrossTalk.Binding({})
-    // this.models = this.holder.bindable
+    this.models = new glue({})
   }
 
   Concise.prototype.controllers = {}
@@ -132,10 +131,7 @@ THE SOFTWARE.
   function elFromString(desc){
     var el=null, tag='', id='', classes=[], type='', regex=null, matches=true, properties={}, props=''
 
-    if (/{[\w-]+}/g.test(desc))
-      throw new Error("elFromString() received a widget identifier.")
-
-    if (/#/g.test(desc) &&/#/g.test(desc).length > 1)
+    if (/#/g.test(desc) && /#/g.test(desc).length > 1)
       throw new Error("HTML descriptor cannot contain multiple id's: "+desc)
 
     if (! /^\w/g.test(desc))
@@ -171,7 +167,7 @@ THE SOFTWARE.
 
   function Helpers(){
     return {
-      each: function(o,data,constructor){ // console.log('EACH HELPER', o)
+      each: function(o,data,constructor){
 
         Object.keys(data).map(function(key){
           var maintainer
