@@ -2,7 +2,7 @@
 
 (WIP)
 
-_Concise.js_ is a next-gen frontend framework. The general philosophy is to remove as much junk as possible, leaving you with only straight javascript and HTML elements that are immediately alive and interactive the moment they enter the DOM. Concise.js is built upon Connected.js, an only-when-changed 2-way data binding library.
+_Concise.js_ is a next-gen frontend framework. The general philosophy is to remove as much junk as possible, leaving you with only straight javascript and HTML elements that are immediately alive and interactive the moment they enter the DOM. Concise.js is built upon Connected.js, a never-polling 2-way data binding library.
 
 ## Demo
 
