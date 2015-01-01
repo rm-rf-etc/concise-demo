@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 ;(function(){
 
-  annular.controller('home',function(){
+  concise.controller('home',function(o){
 
     var list_of_items = [
       {checked:false, text:'buy almond milk'}
@@ -35,23 +35,27 @@ THE SOFTWARE.
 
     this.models._new_property_ = ['list', list_of_items]
 
-    this.dom = {
+    o.dom = {
       'div.width-6.columns.centered':todoWidget
     }
   })
 
 
-  function todoWidget(){
+  function todoWidget(o){
     var self = this
-    var models = annular.models
-    var list = annular.models.list
+    var models = concise.models
+    var list = concise.models.list
 
-    this.dom = {
+    o.dom = {
       'div.list-editor':{
-        'form':function(){
+        'form':function(o){
           var text_input
-          this.dom = {'input[type="text"][name="new-item-field"]':function(){ text_input = this }}
-          this.dom = {'input[type="submit"]':0}
+          o.dom = {
+            'input[type="text"][name="new-item-field"]':function(){
+              text_input = this
+            },
+            'input[type="submit"]':0
+          }
           this.addEventListener('submit',function(ev){
             ev.preventDefault()
             console.log(text_input.value)
@@ -59,11 +63,11 @@ THE SOFTWARE.
           })
         }
       },
-      'ul each(models.list)':function(name,item){ this.dom = {
+      'ul each(models.list)':function(o,id,item){ o.dom = {
         'li':{
           'input[type="checkbox"]':function(){
 
-            annular.modelHandler.bind(item,'checked',function(val){
+            concise.holder.bind(item,'checked',function(val){
               this.checked = item.checked
             }.bind(this))
 
@@ -88,7 +92,7 @@ THE SOFTWARE.
               this.addEventListener('input',function(ev){
                 input_handler(function(){ item.text = field.value })
               })
-              annular.modelHandler.bind(item,'text',function(val){
+              concise.holder.bind(item,'text',function(val){
                 output_handler(function(){ field.value = val })
               })
 
@@ -96,11 +100,11 @@ THE SOFTWARE.
           }
         }
       }},
-      'button#delete.right':function(){
+      'button#delete.right':function(o){
         this.innerHTML = 'clear completed'
         this.addEventListener('click',function(){
-          self.each(models,'list',function(id,item){
-            if (this.checked) models.list.splice( models.list.indexOf(item), 1 )
+          list.map(function(item){
+            if (this.checked) list.splice( list.indexOf(item), 1 )
           })
         })
       }
