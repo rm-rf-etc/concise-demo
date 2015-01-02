@@ -66,14 +66,15 @@ THE SOFTWARE.
       'ul each(models.list)':function(o,id,item){ o.dom = {
         'li':{
           'input[type="checkbox"]':function(){
+            var self = this
 
             concise.models.bind(item,'checked',function(val){
-              this.checked = item.checked
-            }.bind(this))
+              self.checked = item.checked
+            })
 
-            this.addEventListener('click',function(ev){
-              item.checked = this.checked
-            }.bind(this))
+            self.addEventListener('click',function(ev){
+              item.checked = self.checked
+            })
 
           },
           'button.delete-this':function(){
@@ -87,7 +88,7 @@ THE SOFTWARE.
             var field = this
             field.value = item.text
 
-            glue.fieldManager(function(input_handler, output_handler){
+            Connected.fieldManager(function(input_handler, output_handler){
 
               field.addEventListener('input',function(ev){
                 input_handler(function(){ item.text = field.value })

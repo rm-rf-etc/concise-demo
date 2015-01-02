@@ -36,7 +36,7 @@ THE SOFTWARE.
   */
 
   function Concise(){
-    this.models = new glue({})
+    this.models = new Connected({})
   }
 
   Concise.prototype.controllers = {}
