@@ -50,17 +50,17 @@ THE SOFTWARE.
       'div.list-editor':{
         'form':function(o){
           var text_input
+          this.addEventListener('submit',function(ev){
+            ev.preventDefault()
+            list.push({checked:false, text:text_input.value})
+            console.log('Item appended:',list)
+          })
           o.dom = {
             'input[type="text"][name="new-item-field"]':function(){
               text_input = this
             },
             'input[type="submit"]':0
           }
-          this.addEventListener('submit',function(ev){
-            ev.preventDefault()
-            list.push({checked:false, text:text_input.value})
-            console.log('Item appended:',list)
-          })
         }
       },
       'ul each(models.list)':function(o,id,item){ o.dom = {
@@ -102,10 +102,11 @@ THE SOFTWARE.
         }
       }},
       'button#delete.right':function(o){
-        this.innerHTML = 'clear completed'
-        this.addEventListener('click',function(){
+        var self = this
+        self.innerHTML = 'clear completed'
+        self.addEventListener('click',function(){
           list.map(function(item){
-            if (this.checked) list.splice( list.indexOf(item), 1 )
+            if (self.checked) list.splice( list.indexOf(item), 1 )
           })
         })
       }

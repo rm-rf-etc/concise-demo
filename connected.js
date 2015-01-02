@@ -164,6 +164,9 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     OVERRIDE(self, 'reverse', function(idx1, idx2){
       //
     })
+    OVERRIDE(self, 'sort', function(idx1, idx2){
+      //
+    })
     OVERRIDE(self, 'concat', function(arr){
       if (arr && arr.length) {
         Object.keys(arr).map(function(key){
