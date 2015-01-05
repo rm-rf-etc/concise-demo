@@ -99,7 +99,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   }
 
 
-  function BindableObject(data){
+  function BindableObject(data){ console.log(data)
     Object.keys(data).map(function(prop){
       this._new_property_ = [prop, data[prop]]
     }.bind(this))
@@ -345,7 +345,8 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   }
 
   function typeOf(thing){
-    return (!!thing && !Number.isNaN(thing) && thing.constructor) ? thing.constructor.name : '' + thing
+    // Using `!=` so that `false` will evaluate to true, while all other falsey values are false.
+    return (thing != null && !Number.isNaN(thing) && thing.constructor) ? thing.constructor.name : '' + thing
   }
 
 
