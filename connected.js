@@ -42,7 +42,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   var OVERRIDE = function(object, method_name, method){
     DEFINE(object, method_name, { enumerable:false, configurable:false, value:method })
   }
-  var _property_manipulator_ = null
+  var _property_manipulator_
   var PROPERTY_MANIPULATOR = function(obj){
     if (! obj) return _property_manipulator_
     else _property_manipulator_ = obj
@@ -125,20 +125,20 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     DEFINE(self, '_array_events_', { enumerable:false, configurable:false,
       set:function(manipulator){
         if (manipulator === PROPERTY_MANIPULATOR && PROPERTY_MANIPULATOR().fetch)
-          PROPERTY_MANIPULATOR().fetch(this._id)
+          PROPERTY_MANIPULATOR().fetch(self._id)
       }
     })
     OVERRIDE(self, 'push', function(obj){
 
       self._new_property_ = [self.length, obj]
-      _events.trigger(this._id, [self.length-1, self[self.length-1]], 'push')
+      _events.trigger(self._id, [self.length-1, self[self.length-1]], 'push')
 
     })
     OVERRIDE(self, 'pop', function(){
 
       var r = self[self.length-1]
       self.length = self.length-1
-      _events.trigger(this._id, r, 'pop')
+      _events.trigger(self._id, r, 'pop')
       return r
 
     })
@@ -152,7 +152,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         })
       })
       self.length = self.length-1
-      _events.trigger(this._id, r, 'shift')
+      _events.trigger(self._id, r, 'shift')
       return r
 
     })
@@ -166,20 +166,23 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         })
       })
       self._new_property_ = [0, obj]
-      _events.trigger(this._id, self, 'unshift')
+      _events.trigger(self._id, self, 'unshift')
       return self.length
 
     })
     OVERRIDE(self, 'splice', function(){
 
+      debounced(60, 'splice'+self._id, function(){
+        _events.trigger(self._id, self, 'splice')
+        console.log( 'emit: splice'+self._id )
+      })
       Array.prototype.splice.apply(self, arguments)
-      _events.trigger(this._id, self, 'splice')
 
     })
     OVERRIDE(self, 'slice', function(){
 
       Array.prototype.slice.apply(self, arguments)
-      _events.trigger(this._id, self, 'slice')
+      _events.trigger(self._id, self, 'slice')
 
     })
     OVERRIDE(self, 'reverse', function(idx1, idx2){ // This works, but it's not optimized yet.
@@ -198,7 +201,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         // Array.prototype.splice.call(self, length, 1)
       }
       Array.prototype.reverse.call(self)
-      _events.trigger(this._id, self, 'reverse')
+      _events.trigger(self._id, self, 'reverse')
       return self
 
     })
@@ -212,7 +215,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
           self._new_property_ = [self.length, arr[key]]
         })
       }
-      _events.trigger(this._id, self, 'concat')
+      _events.trigger(self._id, self, 'concat')
       return self
 
     })
@@ -348,6 +351,15 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     // Using `!=` so that `false` will evaluate to true, while all other falsey values are false.
     return (thing != null && !Number.isNaN(thing) && thing.constructor) ? thing.constructor.name : '' + thing
   }
+
+  var debounced
+  ;(function(){
+    var bounced = {}
+    debounced = function(t, id, cb){
+      clearTimeout( bounced[id] )
+      bounced[id] = setTimeout(cb, t)
+    }
+  })()
 
 
 

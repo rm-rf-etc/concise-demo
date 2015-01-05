@@ -11,6 +11,8 @@
     "console": false,
     "module": false,
     "window": false,
-    "document": false
+    "document": false,
+    "clearTimeout": false,
+    "setTimeout": false
   }
 }

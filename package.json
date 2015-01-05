@@ -1,0 +1,28 @@
+{
+  "name": "concise",
+  "version": "0.0.0",
+  "description": "Next-generation FE framework",
+  "main": "to-do.js",
+  "dependencies": {
+    "microevent": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rm-rf-etc/concise.git"
+  },
+  "keywords": [
+    "framework",
+    "2-way",
+    "databinding"
+  ],
+  "author": "Rob Christian",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rm-rf-etc/concise/issues"
+  },
+  "homepage": "https://github.com/rm-rf-etc/concise"
+}
