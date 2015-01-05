@@ -31,7 +31,7 @@ THE SOFTWARE.
 
   /*
 
-  Concise Class
+  Concise Classes
 
   */
 
@@ -46,20 +46,25 @@ THE SOFTWARE.
   Concise.prototype.controller = function(name, constructor){
     concise.controllers[name] = constructor
 
-    var body = document.querySelector('#body')
-    var builder = new DomBuilder(body)
-    this.models = concise.models
+    var builder = new DomBuilder()
 
     constructor.call(this,builder)
   }
 
   function DomBuilder(el){
-    this.just_added = null
     this.el = el
-    // this.maintainer = new DomMaintainer(el)
   }
+  DEFINE(DomBuilder.prototype, 'view', {enumerable:false, configurable:false,
+    set:function(el){
+      if (! familyOf(el))
+        throw new Error('View object must be an HTML Element. Try using `o.view = document.querySelector(<your_selector>)`.')
+      else
+        this.el = el
+    }
+  })
   DEFINE(DomBuilder.prototype, 'dom', {enumerable:false, configurable:false,
     set:function(structure){
+      if (! familyOf(this.el)) throw new Error('Missing valid view element. Cannot build a DOM before doing `o.view = document.querySelector(<your_selector>)`.')
       if (typeOf(structure) !== 'Object') throw new Error('Invalid dom structure object.')
 
       var helper_fn, helper_str, builder, key, value, name, data, el_str, el, first_time
@@ -67,6 +72,7 @@ THE SOFTWARE.
 
       Object.keys(structure).map(function(key){
         value = structure[key]
+
 
         if (elDefinitionValidate(key)) {
           el_str = key.split(' ')[0]
@@ -114,60 +120,40 @@ THE SOFTWARE.
       }.bind(this))
     }
   })
-
   // DEFINE(DomBuilder.prototype, 'maintainer', {enumerable:false, configurable:false,
   //   get:function(){ return new DomMaintainer(this) }
   // })
 
 
-  // function DomMaintainer(builder){
-  //   this.el = builder.just_added
-  //   // console.log('DomMaintainer constructor:',this.el)
-  // }
-  // DEFINE(DomMaintainer.prototype, 'dom', {enumerable:false, configurable:false,
-  //   set:function(struct){
-  //     console.log('DomMaintainer.dom = ',struct)
-  //     console.log('this.el',this.el)
-  //     // Object.keys(struct).map(function(key){
-  //     //   console.log(key)
-  //     // })
-  //   }
-  // })
+  function DomMaintainer(el){
+    this.el = el
+    this.structure = {}
+  }
+  DEFINE(DomMaintainer.prototype, 'include', {enumerable:false, configurable:false,
+    value:function(el_str, el){ this.structure[el_str] = el }
+  })
+  DEFINE(DomMaintainer.prototype, 'dom', {enumerable:false, configurable:false,
+    set:function(structure){
+      Object.keys(structure).map(function(key){
+        // console.log('DomMaintainer.dom = ',structure)
+        // console.log('this.el',this.el)
+        var el
+        var faker = new DomProxy(el)
+        if (elDefinitionValidate(key) && key in this.structure) {
+          var el = this.structure[key]
+          fn.call(faker, this)
+        }
+      }.bind(this))
+    }
+  })
 
-  // DEFINE(DomBuilder.prototype, 'maintainer', {enumerable:false, configurable:false,
-  //   get:function(){ return new DomMaintainer(this) }
-  // })
-
-
-  // function DomMaintainer(el){
-  //   this.el = el
-  //   this.structure = {}
-  // }
-  // DEFINE(DomMaintainer.prototype, 'include', {enumerable:false, configurable:false,
-  //   value:function(el_str, el){ this.structure[el_str] = el }
-  // })
-  // DEFINE(DomMaintainer.prototype, 'dom', {enumerable:false, configurable:false,
-  //   set:function(structure){
-  //     Object.keys(structure).map(function(key){
-  //       // console.log('DomMaintainer.dom = ',structure)
-  //       // console.log('this.el',this.el)
-  //       var el
-  //       var faker = new DomProxy(el)
-  //       if (elDefinitionValidate(key) && key in this.structure) {
-  //         var el = this.structure[key]
-  //         fn.call(faker, this)
-  //       }
-  //     }.bind(this))
-  //   }
-  // })
-
-  // function DomProxy(el){
-  //   this.el = el
-  // }
-  // DomProxy.prototype.addEventListener = function(){}
-  // DEFINE(DomProxy.prototype, 'value', { configurable:false, enumerable:false,
-  //   set:function(val){ this.el.value = val }
-  // })
+  function DomProxy(el){
+    this.el = el
+  }
+  DomProxy.prototype.addEventListener = function(){}
+  DEFINE(DomProxy.prototype, 'value', { configurable:false, enumerable:false,
+    set:function(val){ this.el.value = val }
+  })
 
 
 
@@ -208,7 +194,6 @@ THE SOFTWARE.
 
     return el
   }
-
 
 
   function elDefinitionValidate(el_str){

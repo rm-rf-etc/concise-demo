@@ -35,90 +35,123 @@ THE SOFTWARE.
 
     this.models._new_property_ = ['list', list_of_items]
 
-    o.dom = {
-      'div.width-7.columns.centered':todoWidget
-    }
+    o.view = document.querySelector('#view')
+
+    Functionality(o, function(a){return{
+      'div.width-6.columns.centered':{
+        'div.list-editor':{
+          'form':a.forForm(function(a){return{
+            'input[type="text"][name="new-item-field"]':a.newItemInput,
+            'input[type="submit"]':0
+          }})
+        },
+        'ul each(models.list)':a.forEachItem(function(a){return{
+          'li':{
+            'input[type="checkbox"]':a.inputCheckbox,
+            'button.delete-this':a.deleteItemButton,
+            'input[type="text"]':a.itemTextInput
+          }
+        }}),
+        'button#delete.right':a.deleteCompleted
+      }
+    }})
+
   })
 
 
-  function todoWidget(o){
-    var self = this
-    var list = concise.models.list
+  function Functionality(o, bindMarkup){
 
-    o.dom = {
-      'div.list-editor':{
-        'form':function(o){
-          var text_input
-          this.addEventListener('submit',function(ev){
-            ev.preventDefault()
-            list.push({checked:false, text:text_input.value})
-            text_input.value = ''
-          })
-          o.dom = {
-            'input[type="text"][name="new-item-field"]':function(){
-              text_input = this
-            },
-            'input[type="submit"]':0
-          }
-        }
-      },
-      'ul each(models.list)':function(o,id,item){ o.dom = {
-        'li':{
-          'input[type="checkbox"]':function(){
-            var self = this
-            self.checked = item.checked
-
-            concise.models.bind(item,'checked',function(val){
-              self.checked = item.checked
-            })
-
-            self.addEventListener('click',function(ev){
-              item.checked = self.checked
-            })
-
-          },
-          'button.delete-this':function(){
-            this.innerHTML = 'x'
-            this.addEventListener('click',function(){
-              list.splice( list.indexOf(item), 1 )
-            })
-          },
-          'input[type="text"]':function(){
-            var field = this
-            field.value = item.text
-
-            Connected.fieldManager(function(input_handler, output_handler){
-
-              field.addEventListener('input',function(ev){
-                input_handler(function(){ item.text = field.value })
-              })
-              concise.models.bind(item,'text',function(val){
-                output_handler(function(){ field.value = val })
-              })
-
-            })
-          }
-        }
-      }},
-      'button#delete.right':function(){
-        var self = this
-        self.innerHTML = 'clear completed'
-
-        self.addEventListener('click',function(){
-
-          function removeCompleted(item, idx){
-            if (item.checked) Array.prototype.splice.call( list, list.indexOf(item), 1 )
-            else idx++
-
-            if (idx < list.length) removeCompleted(list[idx], idx)
-          }
-
-          removeCompleted(list[0], 0)
-          list.slice()
-        })
-      }
-    }
+    o.dom = bindMarkup({
+      forForm: forForm
+    , forEachItem: forEachItem
+    , deleteCompleted: deleteCompleted
+    })
 
   }
+  var list = concise.models.list
+
+
+  function deleteCompleted(){
+    var self = this
+    self.innerHTML = 'clear completed'
+
+    self.addEventListener('click',function(){
+
+      function removeCompleted(item, idx){
+        if (item.checked) Array.prototype.splice.call( list, list.indexOf(item), 1 )
+        else idx++
+
+        if (idx < list.length) removeCompleted(list[idx], idx)
+      }
+
+      removeCompleted(list[0], 0)
+      list.slice()
+    })
+  }
+
+
+  function forForm(bindMarkup){return function(o){
+    var new_item_input = this
+
+    this.addEventListener('submit',function(ev){
+      ev.preventDefault()
+      list.push({ checked:false, text:new_item_input.value })
+      new_item_input.value = ''
+    })
+
+    o.dom = bindMarkup({
+      newItemInput: function(){
+        new_item_input = this
+      }
+    })
+
+  }}
+
+
+  function forEachItem(bindMarkup){return function(o,id,item){
+
+    o.dom = bindMarkup({
+      inputCheckbox: function(o){
+        var self = this
+        self.checked = item.checked
+
+        concise.models.bind(item,'checked',function(val){
+          self.checked = item.checked
+        })
+
+        self.addEventListener('click',function(ev){
+          item.checked = self.checked
+        })
+      },
+
+      deleteItemButton: function(){
+        var self = this
+        self.innerHTML = 'x'
+        self.addEventListener('click',function(){
+          // if (confirm('Delete this item?'))
+          list.splice( list.indexOf(item), 1 )
+        })
+      },
+
+      itemTextInput: function(){
+        var field = this
+
+        Connected.fieldManager(function(input_handler, output_handler){
+
+          field.addEventListener('input',function(ev){
+            input_handler(function(){ item.text = field.value })
+          })
+
+          concise.models.bind(item,'text',function(val){
+            output_handler(function(){ field.value = val })
+          })
+
+        })
+
+        field.value = item.text
+      }
+    })
+
+  }}
 
 })();
