@@ -23,6 +23,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/*
+
+Semi-colons are just FUD. If your minifier can't handle this code, switch to one that is JS-compliant.
+http://blog.izs.me/post/2353458699/an-open-letter-to-javascript-leaders-regarding
+http://inimino.org/~inimino/blog/javascript_semicolons
+
+*/
+
+
 ;(function(){
 
   concise.controller('home',function(o){

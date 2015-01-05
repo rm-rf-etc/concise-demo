@@ -64,13 +64,14 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   }
 
   function bind(){ // console.log('BIND', arguments)
+    var setter_cb, property, parent, opts
 
-    var opts = Array.prototype.slice.call(arguments)
+    opts = Array.prototype.slice.call(arguments)
 
     if (opts.length === 3) {
-      var parent = opts[0]
-      var property = opts[1]
-      var setter_cb = opts[2]
+      parent = opts[0]
+      property = opts[1]
+      setter_cb = opts[2]
 
       parent[property] = PROPERTY_MANIPULATOR({
         fetch:function(id){ _events.bind(id,setter_cb) }
@@ -78,7 +79,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     }
 
     else if (typeOf(opts[0] === 'Array')) {
-      var setter_cb = opts[1]
+      setter_cb = opts[1]
       // opts[0]._array_events_ = PROPERTY_MANIPULATOR({
       //   fetch:function(id){ _events.bind(id,setter_cb) }
       // })
@@ -224,12 +225,12 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
 
   function addProperty(args){
-    var _val = undefined
-    var _id = +Math.random().toString().split('.')[1]
+    var _val, _id, key, val
+    _id = +Math.random().toString().split('.')[1]
 
     if (typeOf(args) === 'Array') {
-      var key = args[0]
-      var val = args[1]
+      key = args[0]
+      val = args[1]
     } else {
       console.log('Abort! Bad property assignment:',args)
       return
@@ -344,7 +345,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   }
 
   function typeOf(thing){
-    return (thing != null && !Number.isNaN(thing) && thing.constructor) ? thing.constructor.name : '' + thing
+    return (!!thing && !Number.isNaN(thing) && thing.constructor) ? thing.constructor.name : '' + thing
   }
 
 

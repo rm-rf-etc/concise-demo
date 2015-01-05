@@ -23,6 +23,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/*
+
+Semi-colons are just FUD. If your minifier can't handle this code, switch to one that is JS-compliant.
+
+*/
+
+
+
 ;(function(){
 
   window.concise = new Concise()
@@ -67,7 +75,7 @@ THE SOFTWARE.
       if (! familyOf(this.el)) throw new Error('Missing valid view element. Cannot build a DOM before doing `o.view = document.querySelector(<your_selector>)`.')
       if (typeOf(structure) !== 'Object') throw new Error('Invalid dom structure object.')
 
-      var helper_fn, helper_str, builder, key, value, name, data, el_str, el, first_time
+      var helper_fn, helper_str, builder, value, data, el_str, el
 
 
       Object.keys(structure).map(function(key){
@@ -125,27 +133,27 @@ THE SOFTWARE.
   // })
 
 
-  function DomMaintainer(el){
-    this.el = el
-    this.structure = {}
-  }
-  DEFINE(DomMaintainer.prototype, 'include', {enumerable:false, configurable:false,
-    value:function(el_str, el){ this.structure[el_str] = el }
-  })
-  DEFINE(DomMaintainer.prototype, 'dom', {enumerable:false, configurable:false,
-    set:function(structure){
-      Object.keys(structure).map(function(key){
-        // console.log('DomMaintainer.dom = ',structure)
-        // console.log('this.el',this.el)
-        var el
-        var faker = new DomProxy(el)
-        if (elDefinitionValidate(key) && key in this.structure) {
-          var el = this.structure[key]
-          fn.call(faker, this)
-        }
-      }.bind(this))
-    }
-  })
+  // function DomMaintainer(el){
+  //   this.el = el
+  //   this.structure = {}
+  // }
+  // DEFINE(DomMaintainer.prototype, 'include', {enumerable:false, configurable:false,
+  //   value:function(el_str, el){ this.structure[el_str] = el }
+  // })
+  // DEFINE(DomMaintainer.prototype, 'dom', {enumerable:false, configurable:false,
+  //   set:function(structure){
+  //     Object.keys(structure).map(function(key){
+  //       // console.log('DomMaintainer.dom = ',structure)
+  //       // console.log('this.el',this.el)
+  //       var el
+  //       var faker = new DomProxy(el)
+  //       if (elDefinitionValidate(key) && key in this.structure) {
+  //         el = this.structure[key]
+  //         fn.call(faker, this)
+  //       }
+  //     }.bind(this))
+  //   }
+  // })
 
   function DomProxy(el){
     this.el = el
@@ -160,7 +168,7 @@ THE SOFTWARE.
   /* Takes a CSS selector-style string and generates corresponding real DOM element. */
 
   function elFromString(desc){
-    var el=null, tag='', id='', classes=[], type='', regex=null, matches=true, properties={}, props=''
+    var el=null, tag='', id='', classes=[], regex=null, matches=true, properties={}
 
     if (/#/g.test(desc) && /#/g.test(desc).length > 1)
       throw new Error("HTML descriptor cannot contain multiple id's: "+desc)
@@ -169,16 +177,18 @@ THE SOFTWARE.
       throw new Error("Descriptor doesn't begin with a tag name: "+desc)
 
     regex = /\[(\w+)=["'](\w+)["']\]/g
-    while (matches = regex.exec(desc))
+    while ((matches = regex.exec(desc))) {
       properties[matches[1]] = matches[2]
+    }
 
     tag = /^(h[1-6]|[a-z]+)/g.exec(desc)[1]
 
     id = /#[^.]+/g.test(desc) ? /#([^.]+)/g.exec(desc)[1] : null
 
     regex = /(\.[^#.]+)/g
-    while (matches = regex.exec(desc))
+    while ((matches = regex.exec(desc))) {
       classes.push(matches[0].slice(1))
+    }
 
     el = document.createElement(tag)
     if (classes.length)
@@ -186,11 +196,9 @@ THE SOFTWARE.
     if (id)
       el.id = id
 
-    var props = Object.keys(properties)
-    for (var i in props) {
-      var prop = props[i]
+    Object.keys(properties).map(function(prop){
       el[prop] = properties[prop]
-    }
+    })
 
     return el
   }
@@ -229,19 +237,12 @@ THE SOFTWARE.
 
         function buildDom(){
           Object.keys(data).map(function(key){
-            var maintainer
 
-            if (typeOf(constructor) === 'Function') {
+            if (typeOf(constructor) === 'Function')
               constructor.call(o.el, o, key, data[key])
-              // maintainer = o.maintainer
 
-              // concise.models.bind(data, key, function(key,val){
-              //   constructor.call(o.el, maintainer, key, val)
-              // })
-            }
-            else if (typeOf(constructor) === 'Object') {
+            else if (typeOf(constructor) === 'Object')
               o.dom = constructor
-            }
 
           })
         }
