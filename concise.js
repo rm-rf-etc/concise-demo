@@ -56,6 +56,7 @@ THE SOFTWARE.
   function DomBuilder(el){
     this.just_added = null
     this.el = el
+    // this.maintainer = new DomMaintainer(el)
   }
   DEFINE(DomBuilder.prototype, 'dom', {enumerable:false, configurable:false,
     set:function(structure){
@@ -67,12 +68,17 @@ THE SOFTWARE.
       Object.keys(structure).map(function(key){
         value = structure[key]
 
-        if (! value) return
-        if (/\s/g.test(key) && key.match(/\s/g).length > 1) throw new Error('Invalid DOM object definition. Cannot have more than one space character.')
+        if (elDefinitionValidate(key)) {
+          el_str = key.split(' ')[0]
+          el = elFromString(el_str)
+        }
+        else return
 
-        el_str = key.split(' ')[0]
-
-        el = elFromString(el_str)
+        if (! value) {
+          this.el.appendChild(el)
+          // this.maintainer.include(el_str, el)
+          return
+        }
         builder = new DomBuilder(el)
 
         helper_str = key.split(' ')[1]
@@ -89,40 +95,79 @@ THE SOFTWARE.
 
           helper_fn(builder,data,value)
           this.el.appendChild(el)
+          // this.maintainer.include(el_str, el)
           this.just_added = el
         }
         else if (typeOf(value) === 'Object') {
           builder.dom = value
           this.el.appendChild(el)
+          // this.maintainer.include(el_str, el)
           this.just_added = el
         }
         else if (typeOf(value) === 'Function') {
           value.call(el,builder)
           this.el.appendChild(el)
+          // this.maintainer.include(el_str, el)
           this.just_added = el
         }
 
       }.bind(this))
     }
   })
-  DEFINE(DomBuilder.prototype, 'maintainer', {enumerable:false, configurable:false,
-    get:function(){ return new DomMaintainer(this) }
-  })
+
+  // DEFINE(DomBuilder.prototype, 'maintainer', {enumerable:false, configurable:false,
+  //   get:function(){ return new DomMaintainer(this) }
+  // })
 
 
-  function DomMaintainer(builder){
-    this.el = builder.just_added
-    // console.log('DomMaintainer constructor:',this.el)
-  }
-  DEFINE(DomMaintainer.prototype, 'dom', {enumerable:false, configurable:false,
-    set:function(struct){
-      console.log('DomMaintainer.dom = ',struct)
-      console.log('this.el',this.el)
-      // Object.keys(struct).map(function(key){
-      //   console.log(key)
-      // })
-    }
-  })
+  // function DomMaintainer(builder){
+  //   this.el = builder.just_added
+  //   // console.log('DomMaintainer constructor:',this.el)
+  // }
+  // DEFINE(DomMaintainer.prototype, 'dom', {enumerable:false, configurable:false,
+  //   set:function(struct){
+  //     console.log('DomMaintainer.dom = ',struct)
+  //     console.log('this.el',this.el)
+  //     // Object.keys(struct).map(function(key){
+  //     //   console.log(key)
+  //     // })
+  //   }
+  // })
+
+  // DEFINE(DomBuilder.prototype, 'maintainer', {enumerable:false, configurable:false,
+  //   get:function(){ return new DomMaintainer(this) }
+  // })
+
+
+  // function DomMaintainer(el){
+  //   this.el = el
+  //   this.structure = {}
+  // }
+  // DEFINE(DomMaintainer.prototype, 'include', {enumerable:false, configurable:false,
+  //   value:function(el_str, el){ this.structure[el_str] = el }
+  // })
+  // DEFINE(DomMaintainer.prototype, 'dom', {enumerable:false, configurable:false,
+  //   set:function(structure){
+  //     Object.keys(structure).map(function(key){
+  //       // console.log('DomMaintainer.dom = ',structure)
+  //       // console.log('this.el',this.el)
+  //       var el
+  //       var faker = new DomProxy(el)
+  //       if (elDefinitionValidate(key) && key in this.structure) {
+  //         var el = this.structure[key]
+  //         fn.call(faker, this)
+  //       }
+  //     }.bind(this))
+  //   }
+  // })
+
+  // function DomProxy(el){
+  //   this.el = el
+  // }
+  // DomProxy.prototype.addEventListener = function(){}
+  // DEFINE(DomProxy.prototype, 'value', { configurable:false, enumerable:false,
+  //   set:function(val){ this.el.value = val }
+  // })
 
 
 
@@ -165,30 +210,57 @@ THE SOFTWARE.
   }
 
 
+
+  function elDefinitionValidate(el_str){
+    if (/\s/g.test(el_str) && el_str.match(/\s/g).length > 1) {
+      throw new Error('Invalid DOM object definition. Cannot have more than one space character.')
+      return false
+    }
+    else return true
+  }
+
+
   function Helpers(){
     return {
-      each: function(o,data,constructor){
+      each: function(o,data,constructor){ //console.log( constructor )
 
-        data.bind( data, function(event){
-          if (event[0] === 'push') constructor.call(o.el, o, event[1], event[2])
-        })
+        data.bind( data, function(keyval, type){
 
-        Object.keys(data).map(function(key){
-          var maintainer
+          // Further optimizations are likely to come.
 
-          if (typeOf(constructor) === 'Function') { //console.log('THE KEY', key)
-            constructor.call(o.el, o, key, data[key])
-            maintainer = o.maintainer
-
-            concise.models.bind(data, key, function(key,val){
-              constructor.call(o.el, maintainer, key, val)
-            })
+          if (type === 'push') {
+            constructor.call(o.el, o, keyval[0], keyval[1])
           }
-          else if (typeOf(constructor) === 'Object') {
-            o.dom = constructor
+          else if (type === 'pop') {
+            o.el.lastChild.outerHTML = ''
+          }
+          else {
+            o.el.innerHTML = ''
+            buildDom()
           }
 
         })
+
+
+        function buildDom(){
+          Object.keys(data).map(function(key){
+            var maintainer
+
+            if (typeOf(constructor) === 'Function') {
+              constructor.call(o.el, o, key, data[key])
+              // maintainer = o.maintainer
+
+              // concise.models.bind(data, key, function(key,val){
+              //   constructor.call(o.el, maintainer, key, val)
+              // })
+            }
+            else if (typeOf(constructor) === 'Object') {
+              o.dom = constructor
+            }
+
+          })
+        }
+        buildDom()
       }
     }
   }

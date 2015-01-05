@@ -53,7 +53,7 @@ THE SOFTWARE.
           this.addEventListener('submit',function(ev){
             ev.preventDefault()
             list.push({checked:false, text:text_input.value})
-            console.log('Item appended:',list)
+            text_input.value = ''
           })
           o.dom = {
             'input[type="text"][name="new-item-field"]':function(){
@@ -80,8 +80,7 @@ THE SOFTWARE.
           'button.delete-this':function(){
             this.innerHTML = 'x'
             this.addEventListener('click',function(){
-              // if (confirm('Delete this item?')) list.splice( list.indexOf(item), 1 )
-              console.log( item )
+              list.splice( list.indexOf(item), 1 )
             })
           },
           'input[type="text"]':function(){
@@ -101,13 +100,21 @@ THE SOFTWARE.
           }
         }
       }},
-      'button#delete.right':function(o){
+      'button#delete.right':function(){
         var self = this
         self.innerHTML = 'clear completed'
+
         self.addEventListener('click',function(){
-          list.map(function(item){
-            if (self.checked) list.splice( list.indexOf(item), 1 )
-          })
+
+          function removeCompleted(item, idx){
+            if (item.checked) Array.prototype.splice.call( list, list.indexOf(item), 1 )
+            else idx++
+
+            if (idx < list.length) removeCompleted(list[idx], idx)
+          }
+
+          removeCompleted(list[0], 0)
+          list.slice()
         })
       }
     }
