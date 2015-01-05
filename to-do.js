@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 ;(function(){
 
-  annular.controller('home',function(){
+  concise.controller('home',function(o){
 
     var list_of_items = [
       {checked:false, text:'buy almond milk'}
@@ -35,56 +35,63 @@ THE SOFTWARE.
 
     this.models._new_property_ = ['list', list_of_items]
 
-    this.dom = {
+    o.dom = {
       'div.width-6.columns.centered':todoWidget
     }
   })
 
 
-  function todoWidget(){
+  function todoWidget(o){
     var self = this
-    var models = annular.models
-    var list = annular.models.list
+    var list = concise.models.list
 
-    this.dom = {
+    o.dom = {
       'div.list-editor':{
-        'form':function(){
+        'form':function(o){
           var text_input
-          this.dom = {'input[type="text"][name="new-item-field"]':function(){ text_input = this }}
-          this.dom = {'input[type="submit"]':0}
-          function onSubmit(ev){
+          this.addEventListener('submit',function(ev){
             ev.preventDefault()
-            console.log(text_input.value)
-            // list.push({checked:false, text:text_input.value})
+            list.push({checked:false, text:text_input.value})
+            text_input.value = ''
+          })
+          o.dom = {
+            'input[type="text"][name="new-item-field"]':function(){
+              text_input = this
+            },
+            'input[type="submit"]':0
           }
-          this.addEventListener('submit',onSubmit)
         }
       },
-      'ul each(models.list)':function(id,item){ this.dom = {
+      'ul each(models.list)':function(o,id,item){ o.dom = {
         'li':{
           'input[type="checkbox"]':function(){
-            this.addEventListener('click',function(ev){
-              item.checked = this.checked
-              console.log(item)
+            var self = this
+
+            concise.models.bind(item,'checked',function(val){
+              self.checked = item.checked
             })
+
+            self.addEventListener('click',function(ev){
+              item.checked = self.checked
+            })
+
           },
           'button.delete-this':function(){
             this.innerHTML = 'x'
             this.addEventListener('click',function(){
-              // if (confirm('Delete this item?')) list.splice( list.indexOf(item), 1 )
-              console.log( item )
+              list.splice( list.indexOf(item), 1 )
             })
           },
           'input[type="text"]':function(){
             var field = this
-            this.value = item.text
+            field.value = item.text
 
-            CrossTalk.fieldManager(function(input_handler, output_handler){
+            Connected.fieldManager(function(input_handler, output_handler){
 
-              this.addEventListener('input',function(ev){
+              field.addEventListener('input',function(ev){
                 input_handler(function(){ item.text = field.value })
               })
-              annular.modelHandler.bind(item,'text',function(val){
+              concise.models.bind(item,'text',function(val){
                 output_handler(function(){ field.value = val })
               })
 
@@ -93,11 +100,20 @@ THE SOFTWARE.
         }
       }},
       'button#delete.right':function(){
-        this.innerHTML = 'clear completed'
-        this.addEventListener('click',function(){
-          self.each(models,'list',function(id,item){
-            if (this.checked) models.list.splice( models.list.indexOf(item), 1 )
-          })
+        var self = this
+        self.innerHTML = 'clear completed'
+
+        self.addEventListener('click',function(){
+
+          function removeCompleted(item, idx){
+            if (item.checked) Array.prototype.splice.call( list, list.indexOf(item), 1 )
+            else idx++
+
+            if (idx < list.length) removeCompleted(list[idx], idx)
+          }
+
+          removeCompleted(list[0], 0)
+          list.slice()
         })
       }
     }
