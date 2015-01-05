@@ -66,6 +66,7 @@ THE SOFTWARE.
         'li':{
           'input[type="checkbox"]':function(){
             var self = this
+            self.checked = item.checked
 
             concise.models.bind(item,'checked',function(val){
               self.checked = item.checked
