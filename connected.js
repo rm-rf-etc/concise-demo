@@ -325,7 +325,8 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   /*  HELPERS  */
 
   function familyOf(thing){
-    if (typeOf(thing)) {
+    var type = typeOf(thing)
+    if (type) {
       return {
         Date: 'simple'
       , String: 'simple'
@@ -336,7 +337,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
       , Object: 'complex'
       , 'undefined': 'falsey'
       , 'null': 'falsey'
-      }[typeOf(thing)] || 'complex'
+      }[type] || (/^HTML\w*Element$/g.test(type) ? 'HTMLElement' : 'complex')
     } else {
       return false
     }
