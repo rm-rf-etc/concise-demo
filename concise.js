@@ -218,20 +218,15 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
       each: function(o,data,constructor){ //console.log( constructor )
 
         data.bind( data, function(keyval, type){
-
           // Further optimizations are likely to come.
-
-          if (type === 'push') {
-            constructor.call(o.el, o, keyval[0], keyval[1])
-          }
-          else if (type === 'pop') {
-            o.el.lastChild.outerHTML = ''
-          }
-          else {
-            o.el.innerHTML = ''
-            buildDom()
-          }
-
+          // if (type === 'push') {
+          //   constructor.call(o.el, o, keyval[0], keyval[1])
+          // }
+          // else if (type === 'pop') {
+          //   o.el.lastChild.outerHTML = ''
+          // }
+          o.el.innerHTML = ''
+          buildDom()
         })
 
 

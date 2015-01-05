@@ -116,6 +116,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     var self = []
 
     DEFINE(self, '_id', { enumerable:false, configurable:false, value:+Math.random().toString().split('.')[1] })
+    DEFINE(self, '_timeout', { enumerable:false, configurable:false, value:60 })
     DEFINE(self, 'bind', { enumerable:false, configurable:false, value:bind })
     DEFINE(self, 'unbind', { enumerable:false, configurable:false, value:unbind })
     DEFINE(self, 'recompute', { enumerable:false, configurable:false, value:recompute })
@@ -131,14 +132,20 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     OVERRIDE(self, 'push', function(obj){
 
       self._new_property_ = [self.length, obj]
-      _events.trigger(self._id, [self.length-1, self[self.length-1]], 'push')
+      debounce(self._timeout, 'push'+self._id, function(){
+        _events.trigger(self._id, [self.length-1, self[self.length-1]], 'push')
+        console.log( 'emit: push'+self._id )
+      })
 
     })
     OVERRIDE(self, 'pop', function(){
 
       var r = self[self.length-1]
       self.length = self.length-1
-      _events.trigger(self._id, r, 'pop')
+      debounce(self._timeout, 'pop'+self._id, function(){
+        _events.trigger(self._id, r, 'pop')
+        console.log( 'emit: pop'+self._id )
+      })
       return r
 
     })
@@ -152,7 +159,10 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         })
       })
       self.length = self.length-1
-      _events.trigger(self._id, r, 'shift')
+      debounce(self._timeout, 'shift'+self._id, function(){
+        _events.trigger(self._id, r, 'shift')
+        console.log( 'emit: shift'+self._id )
+      })
       return r
 
     })
@@ -166,13 +176,16 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         })
       })
       self._new_property_ = [0, obj]
-      _events.trigger(self._id, self, 'unshift')
+      debounce(self._timeout, 'unshift'+self._id, function(){
+        _events.trigger(self._id, self, 'unshift')
+        console.log( 'emit: unshift'+self._id )
+      })
       return self.length
 
     })
     OVERRIDE(self, 'splice', function(){
 
-      debounced(60, 'splice'+self._id, function(){
+      debounce(self._timeout, 'splice'+self._id, function(){
         _events.trigger(self._id, self, 'splice')
         console.log( 'emit: splice'+self._id )
       })
@@ -182,7 +195,10 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     OVERRIDE(self, 'slice', function(){
 
       Array.prototype.slice.apply(self, arguments)
-      _events.trigger(self._id, self, 'slice')
+      debounce(self._timeout, 'slice'+self._id, function(){
+        _events.trigger(self._id, self, 'slice')
+        console.log( 'emit: slice'+self._id )
+      })
 
     })
     OVERRIDE(self, 'reverse', function(idx1, idx2){ // This works, but it's not optimized yet.
@@ -201,7 +217,10 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         // Array.prototype.splice.call(self, length, 1)
       }
       Array.prototype.reverse.call(self)
-      _events.trigger(self._id, self, 'reverse')
+      debounce(self._timeout, 'reverse'+self._id, function(){
+        _events.trigger(self._id, self, 'reverse')
+        console.log( 'emit: reverse'+self._id )
+      })
       return self
 
     })
@@ -215,7 +234,10 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
           self._new_property_ = [self.length, arr[key]]
         })
       }
-      _events.trigger(self._id, self, 'concat')
+      debounce(self._timeout, 'concat'+self._id, function(){
+        _events.trigger(self._id, self, 'concat')
+        console.log( 'emit: concat'+self._id )
+      })
       return self
 
     })
@@ -352,10 +374,10 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     return (thing != null && !Number.isNaN(thing) && thing.constructor) ? thing.constructor.name : '' + thing
   }
 
-  var debounced
+  var debounce
   ;(function(){
     var bounced = {}
-    debounced = function(t, id, cb){
+    debounce = function(t, id, cb){
       clearTimeout( bounced[id] )
       bounced[id] = setTimeout(cb, t)
     }
