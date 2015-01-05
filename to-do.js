@@ -43,7 +43,6 @@ THE SOFTWARE.
 
   function todoWidget(o){
     var self = this
-    var models = concise.models
     var list = concise.models.list
 
     o.dom = {
