@@ -87,15 +87,13 @@ http://inimino.org/~inimino/blog/javascript_semicolons
     self.addEventListener('click',function(){
 
       function removeCompleted(item, idx){
-        // if (item.checked) Array.prototype.splice.call( list, list.indexOf(item), 1 )
         if (item.checked) list.splice( list.indexOf(item), 1 )
         else idx++
 
         if (idx < list.length) removeCompleted(list[idx], idx)
       }
-
       removeCompleted(list[0], 0)
-      list.slice()
+
     })
   }
 
