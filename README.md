@@ -6,7 +6,7 @@ _Concise.js_ is a next-gen frontend framework. The general philosophy is to remo
 
 ## Demo
 
-The below example is a to-do app, see [to-do.js](//github.com/rm-rf-etc/concise/blob/master/to-do.js). Connected and Concise don't yet support a variety of array methods, aside from push(). The goal right now is to get these methods working, along with the DomMaintainer functionality which updates the to-do list as a whole.
+The below example is a to-do app, see [to-do.js](//github.com/rm-rf-etc/concise/blob/master/to-do.js).
 
 ``` javascript
 ;(function(){
@@ -20,9 +20,11 @@ The below example is a to-do app, see [to-do.js](//github.com/rm-rf-etc/concise/
     ]
 
     this.models._new_property_ = ['list', list_of_items]
+    
+    o.view = document.querySelector('#view')
 
     o.dom = {
-      'div.width-6.columns.centered':todoWidget
+      'div.width-7.columns.centered':todoWidget
     }
   })
 
