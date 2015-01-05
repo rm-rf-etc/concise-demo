@@ -36,7 +36,7 @@ THE SOFTWARE.
     this.models._new_property_ = ['list', list_of_items]
 
     o.dom = {
-      'div.width-6.columns.centered':todoWidget
+      'div.width-7.columns.centered':todoWidget
     }
   })
 
