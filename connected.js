@@ -387,6 +387,8 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
   NewBindable.fieldManager = fieldManager
   NewBindable.bindForm = bindForm
+  NewBindable.unbind = unbind
+  NewBindable.bind = bind
 
   DEFINE(NewBindable, 'bindables', {get:function(){return _bindables}, enumerable:true})
   DEFINE(NewBindable, 'PROPERTY_MANIPULATOR', {value:PROPERTY_MANIPULATOR, writeable:false})

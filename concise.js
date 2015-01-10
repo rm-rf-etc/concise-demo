@@ -44,7 +44,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   */
 
   function Concise(){
-    this.models = new Connected({})
+    // this.models = new Connected({})
   }
 
   Concise.prototype.controllers = {}
