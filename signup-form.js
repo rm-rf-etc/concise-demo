@@ -66,22 +66,22 @@ http://inimino.org/~inimino/blog/javascript_semicolons
               signup_form_el = this
               o.dom = {
                 "label1":function(){ this.innerHTML = 'Email' },
-                "input1[type='email']":function(){
+                "input1[type='email'][pattern='^\w+@\w+\.[\w.]+[^.]$'][required]":function(){
                   var self = this
                   this.addEventListener('input',function(ev){ signup_mdl.name = self.value })
                 },
                 "label2":function(){ this.innerHTML = 'Confirm Email' },
-                "input2[type='email']":function(){
+                "input2[type='email'][required]":function(){
                   var self = this
                   this.addEventListener('input',function(){ signup_mdl._name = self.value })
                 },
                 "label3":function(){ this.innerHTML = 'Password' },
-                "input3[type='password']":function(){
+                "input3[type='password'][required]":function(){
                   var self = this
                   this.addEventListener('input',function(){ signup_mdl.pass = self.value })
                 },
                 "label4":function(){ this.innerHTML = 'Confirm Password' },
-                "input4[type='password']":function(){
+                "input4[type='password'][required]":function(){
                   var self = this
                   this.addEventListener('input',function(){ signup_mdl._pass = self.value })
                 },
@@ -105,12 +105,12 @@ http://inimino.org/~inimino/blog/javascript_semicolons
               this.style.display = 'none'
               o.dom = {
                 "label1":function(){ this.innerHTML = 'Email' },
-                "input1[type='email']":function(){
+                "input1[type='email'][required][pattern='^\w+@\w+\.[\w.]+[^.]$']":function(){
                   var self = this
                   this.addEventListener('input',function(){ signin_mdl.name = self.value })
                 },
                 "label2":function(){ this.innerHTML = 'Password' },
-                "input2[type='password']":function(){
+                "input2[type='password'][required]":function(){
                   var self = this
                   this.addEventListener('input',function(){ signin_mdl.pass = self.value })
                 },

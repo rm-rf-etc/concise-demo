@@ -176,18 +176,23 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     if (! /^\w/g.test(desc))
       throw new Error("Descriptor doesn't begin with a tag name: "+desc)
 
-    regex = /\[(\w+)=["'](\w+)["']\]/g
+    regex = /\[(\w+)=["'](.*?)["']\]/g
     while ((matches = regex.exec(desc))) {
       properties[matches[1]] = matches[2]
+    }
+    regex = /\[(\w+)\]/g
+    while ((matches = regex.exec(desc))) {
+      properties[matches[1]] = true
     }
 
     tag = /^(h[1-6]|[a-z]+)/g.exec(desc)[1]
 
     id = /#[^.]+/g.test(desc) ? /#([^.]+)/g.exec(desc)[1] : null
 
-    regex = /(\.[^#.]+)/g
+    regex = /\.([\w-]+)/g
     while ((matches = regex.exec(desc))) {
-      classes.push(matches[0].slice(1))
+      // console.log('CLASS', matches[1])
+      classes.push(matches[1])
     }
 
     el = document.createElement(tag)
@@ -197,6 +202,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
       el.id = id
 
     Object.keys(properties).map(function(prop){
+      // console.log('ATTR', prop, properties[prop])
       el[prop] = properties[prop]
     })
 
