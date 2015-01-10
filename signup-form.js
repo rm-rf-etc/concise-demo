@@ -85,11 +85,17 @@ http://inimino.org/~inimino/blog/javascript_semicolons
                   var self = this
                   this.addEventListener('input',function(){ signup_mdl._pass = self.value })
                 },
-                "button.right":function(){
+                "button.left":function(){
                   this.innerHTML = 'Sign-In'
                   this.addEventListener('click',function(ev){ ev.preventDefault()
                     signup_form_el.style.display = 'none'
                     signin_form_el.style.display = 'block'
+                  })
+                },
+                "button.right":function(){
+                  this.innerHTML = 'Submit'
+                  this.addEventListener('click',function(ev){ ev.preventDefault()
+                    window.alert('Not implemented yet.')
                   })
                 }
               }
@@ -108,11 +114,17 @@ http://inimino.org/~inimino/blog/javascript_semicolons
                   var self = this
                   this.addEventListener('input',function(){ signin_mdl.pass = self.value })
                 },
-                "button.right":function(){
+                "button.left":function(){
                   this.innerHTML = 'Sign-Up'
                   this.addEventListener('click',function(ev){ ev.preventDefault()
                     signin_form_el.style.display = 'none'
                     signup_form_el.style.display = 'block'
+                  })
+                },
+                "button.right":function(){
+                  this.innerHTML = 'Submit'
+                  this.addEventListener('click',function(ev){ ev.preventDefault()
+                    window.alert('Not implemented yet.')
                   })
                 }
               }
