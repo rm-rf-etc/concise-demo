@@ -66,7 +66,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
               signup_form_el = this
               o.dom = {
                 "label1":function(){ this.innerHTML = 'Email' },
-                "input1[type='email'][pattern='^\w+@\w+\.[\w.]+[^.]$'][required]":function(){
+                "input1[type='email'][pattern='^\\w+@\\w+\\.[\\w.]+[^.]$'][required]":function(){
                   var self = this
                   this.addEventListener('input',function(ev){ signup_mdl.name = self.value })
                 },
@@ -105,7 +105,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
               this.style.display = 'none'
               o.dom = {
                 "label1":function(){ this.innerHTML = 'Email' },
-                "input1[type='email'][required][pattern='^\w+@\w+\.[\w.]+[^.]$']":function(){
+                "input1[type='email'][required][pattern='^\\w+@\\w+\\.[\\w.]+[^.]$']":function(){
                   var self = this
                   this.addEventListener('input',function(){ signin_mdl.name = self.value })
                 },
