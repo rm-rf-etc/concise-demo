@@ -42,15 +42,14 @@ http://inimino.org/~inimino/blog/javascript_semicolons
     o.view = document.querySelector('#view')
 
     function validEmail(){
-      signup_mdl.valid = /^\w+@\w+\.[\w\.]+$/.test( signup_mdl.name ) && signup_mdl.name === signup_mdl._name
+      return /^\w+@\w+\.[\w\.]+$/.test( this.name ) && this.name === this._name
     }
     function validPassword(){
-      signup_mdl.valid = signup_mdl.pass == signup_mdl._pass && signup_mdl.pass.length > 4 && signup_mdl.pass.length < 20
+      return this.pass == this._pass && this.pass.length > 4 && this.pass.length < 20
     }
     function validForm(){
-      validEmail()
-      validPassword()
-      console.log( 'VALID?', signup_mdl.valid )
+      this.valid = validEmail.bind(signup_mdl)() && validPassword.bind(signup_mdl)()
+      console.log( 'VALID?', this.valid )
     }
 
     o.dom = {
@@ -58,10 +57,10 @@ http://inimino.org/~inimino/blog/javascript_semicolons
         "section.width-6.centered":function(o){
           var signup_form_el
           var signin_form_el
-          Connected.bind(signup_mdl,'name',validForm)
-          Connected.bind(signup_mdl,'_name',validForm)
-          Connected.bind(signup_mdl,'pass',validForm)
-          Connected.bind(signup_mdl,'_pass',validForm)
+          Connected.bind(signup_mdl,'name',validForm.bind( signup_mdl ))
+          Connected.bind(signup_mdl,'_name',validForm.bind( signup_mdl ))
+          Connected.bind(signup_mdl,'pass',validForm.bind( signup_mdl ))
+          Connected.bind(signup_mdl,'_pass',validForm.bind( signup_mdl ))
           o.dom = {
             "form#register":function(o){
               signup_form_el = this
