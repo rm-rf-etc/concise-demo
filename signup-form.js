@@ -68,29 +68,28 @@ http://inimino.org/~inimino/blog/javascript_semicolons
                 "label1":function(){ this.innerHTML = 'Email' },
                 "input1[type='email']":function(){
                   var self = this
-                  this.addEventListener('input',function(ev){
-                    signup_mdl.name = self.value
-                  })
+                  this.addEventListener('input',function(ev){ signup_mdl.name = self.value })
                 },
                 "label2":function(){ this.innerHTML = 'Confirm Email' },
                 "input2[type='email']":function(){
                   var self = this
-                  this.addEventListener('input',function(){
-                    signup_mdl._name = self.value
-                  })
+                  this.addEventListener('input',function(){ signup_mdl._name = self.value })
                 },
                 "label3":function(){ this.innerHTML = 'Password' },
                 "input3[type='password']":function(){
                   var self = this
-                  this.addEventListener('input',function(){
-                    signup_mdl.pass = self.value
-                  })
+                  this.addEventListener('input',function(){ signup_mdl.pass = self.value })
                 },
                 "label4":function(){ this.innerHTML = 'Confirm Password' },
                 "input4[type='password']":function(){
                   var self = this
-                  this.addEventListener('input',function(){
-                    signup_mdl._pass = self.value
+                  this.addEventListener('input',function(){ signup_mdl._pass = self.value })
+                },
+                "button.right":function(){
+                  this.innerHTML = 'Sign-In'
+                  this.addEventListener('click',function(ev){ ev.preventDefault()
+                    signup_form_el.style.display = 'none'
+                    signin_form_el.style.display = 'block'
                   })
                 }
               }
@@ -99,11 +98,22 @@ http://inimino.org/~inimino/blog/javascript_semicolons
               signin_form_el = this
               this.style.display = 'none'
               o.dom = {
+                "label1":function(){ this.innerHTML = 'Email' },
                 "input1[type='email']":function(){
-                  //
+                  var self = this
+                  this.addEventListener('input',function(){ signin_mdl.name = self.value })
                 },
+                "label2":function(){ this.innerHTML = 'Password' },
                 "input2[type='password']":function(){
-                  //
+                  var self = this
+                  this.addEventListener('input',function(){ signin_mdl.pass = self.value })
+                },
+                "button.right":function(){
+                  this.innerHTML = 'Sign-Up'
+                  this.addEventListener('click',function(ev){ ev.preventDefault()
+                    signin_form_el.style.display = 'none'
+                    signup_form_el.style.display = 'block'
+                  })
                 }
               }
             }
