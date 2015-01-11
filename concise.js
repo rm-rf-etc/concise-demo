@@ -60,18 +60,18 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
   function DomBuilder(el){
     this.el = el
-    this.modifiers = []
+    this.models = []
   }
   DEFINE(DomBuilder.prototype, 'view', {enumerable:false, configurable:false,
     set:function(el){
-      if (! familyOf(el))
+      if (!el || ! el instanceof HTMLElement)
         throw new Error('View object must be an HTML Element. Try using `o.view = document.querySelector(<your_selector>)`.')
       else
         this.el = el
     }
   })
   DEFINE(DomBuilder.prototype, 'dom', {enumerable:false, configurable:false,
-    set:function(structure){
+    set:function(structure){ console.log(typeOf(structure), structure)
       if (! familyOf(this.el)) throw new Error('Missing valid view element. Cannot build a DOM before doing `o.view = document.querySelector(<your_selector>)`.')
       if (typeOf(structure) !== 'Object') throw new Error('Invalid dom structure object.')
 
@@ -171,20 +171,21 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   // }
   DomBuilder.prototype.applyValidation = function(el){
     // this.modifiers.push(validator.bind(this))
-    this.model = new Connected({})
-    this.model._new_property_ = ['_valid_', false]
+    var model = new Connected({})
     var builder = this
     var done_for = ['input','textarea']
+    this.models.push( model )
+    model._new_property_ = ['_valid_', false]
 
     var child = el.firstChild
     while (child) {
       if (done_for.indexOf(child.tagName.toLowerCase()) != -1 && child.name) {
-        this.model._new_property_ = [child.name, '']
+        model._new_property_ = [child.name, '']
         child.addEventListener('input',listener.bind(child))
       }
       child = child.nextSibling
     }
-    function listener(){ builder.model[this.name] = this.value }
+    function listener(){ model[this.name] = this.value }
   }
 
 

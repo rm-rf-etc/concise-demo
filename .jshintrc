@@ -13,6 +13,8 @@
     "window": false,
     "document": false,
     "clearTimeout": false,
-    "setTimeout": false
+    "setTimeout": false,
+    "require": false,
+    "HTMLElement": false
   }
 }

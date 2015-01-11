@@ -353,25 +353,29 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   function familyOf(thing){
     var type = typeOf(thing)
     if (type) {
-      return {
+      return ({
         Date: 'simple'
       , String: 'simple'
       , Number: 'simple'
       , Boolean: 'simple'
       , Function: 'simple'
+      , RegExp: 'simple'
       , Array: 'complex'
       , Object: 'complex'
+      , HTMLElement: 'complex'
       , 'undefined': 'falsey'
       , 'null': 'falsey'
-      }[type] || (/^HTML\w*Element$/g.test(type) ? 'HTMLElement' : 'complex')
+      })[type] || 'complex'
+      // })[type] || (/^HTML\w*Element$/g.test(type) ? 'HTMLElement' : 'complex')
     } else {
       return false
     }
   }
 
   function typeOf(thing){
-    // Using `!=` so that `false` will evaluate to true, while all other falsey values are false.
-    return (thing != null && !Number.isNaN(thing) && thing.constructor) ? thing.constructor.name : '' + thing
+    if (typeof thing === 'number') return isNaN(thing) ? 'NaN' : 'Number'
+    else if (thing instanceof HTMLElement) return 'HTMLElement'
+    else return (thing !== null && thing !== undefined && thing.constructor) ? thing.constructor.name : '' + thing
   }
 
   var debounce
