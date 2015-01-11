@@ -85,6 +85,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         if (elDefinitionValidate(key)) {
           el_str = key.split('|')[0]
           parsed = parseElementString(el_str)
+          console.log( 'PARSED', parsed )
           el = parsed.el
         }
         else return
@@ -122,8 +123,8 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
           // this.maintainer.include(el_str, el)
         }
 
+        if (parsed.validate && el.tagName === 'FORM') this.applyValidation(el)
       }.bind(this))
-      if (parsed.validate && parsed.el.tagName === 'FORM') this.applyValidation()
     }
   })
   // DEFINE(DomBuilder.prototype, 'maintainer', {enumerable:false, configurable:false,
@@ -168,14 +169,14 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   //     this.modifiers[i]()
   //   }
   // }
-  DomBuilder.prototype.applyValidation = function() {
+  DomBuilder.prototype.applyValidation = function(el){
     // this.modifiers.push(validator.bind(this))
     this.model = new Connected({})
     this.model._new_property_ = ['_valid_', false]
     var builder = this
     var done_for = ['input','textarea']
 
-    var child = this.el.firstChild
+    var child = el.firstChild
     while (child) {
       if (done_for.indexOf(child.tagName.toLowerCase()) != -1 && child.name) {
         this.model._new_property_ = [child.name, '']
