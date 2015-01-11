@@ -75,7 +75,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
       if (! familyOf(this.el)) throw new Error('Missing valid view element. Cannot build a DOM before doing `o.view = document.querySelector(<your_selector>)`.')
       if (typeOf(structure) !== 'Object') throw new Error('Invalid dom structure object.')
 
-      var helper_fn, helper_str, builder, value, data, el_str, el
+      var helper_fn, helper_str, builder, value, data, el_str, parsed, el
 
 
       Object.keys(structure).map(function(key){
@@ -84,7 +84,8 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
         if (elDefinitionValidate(key)) {
           el_str = key.split('|')[0]
-          el = elFromString(el_str)
+          parsed = parseElementString(el_str)
+          el = parsed.el
         }
         else return
 
@@ -94,22 +95,21 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
           return
         }
         builder = new DomBuilder(el)
+        if (this.model) builder.model = this.model
 
-        helper_str = key.split(' ')[1]
+        if (parsed.helpers) {
+          // if (typeOf(value) !== 'Function') throw new Error('DOM object "'+key+'" defined with helper method but has no function upon which to apply it.')
 
-        if (helper_str) {
-          if (typeOf(value) !== 'Function') throw new Error('DOM object "'+key+'" defined with helper method but has no function upon which to apply it.')
+          // helper_fn = concise.helpers[ helper_str.split('(')[0] ]
 
-          helper_fn = concise.helpers[ helper_str.split('(')[0] ]
+          // data = /\((.+)\)/g.exec(helper_str)[1]
+          // data = data.split('.').reduce(function(object, prop){
+          //   return object[prop]
+          // },concise)
 
-          data = /\((.+)\)/g.exec(helper_str)[1]
-          data = data.split('.').reduce(function(object, prop){
-            return object[prop]
-          },concise)
-
-          helper_fn(builder,data,value)
-          this.el.appendChild(el)
-          // this.maintainer.include(el_str, el)
+          // helper_fn(builder,data,value)
+          // this.el.appendChild(el)
+          // // this.maintainer.include(el_str, el)
         }
         else if (typeOf(value) === 'Object') {
           builder.dom = value
@@ -123,7 +123,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         }
 
       }.bind(this))
-      this.doModifiers()
+      if (parsed.validate && parsed.el.tagName === 'FORM') this.applyValidation()
     }
   })
   // DEFINE(DomBuilder.prototype, 'maintainer', {enumerable:false, configurable:false,
@@ -163,35 +163,36 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
 
 
-  DomBuilder.prototype.doModifiers = function(){
-    for (var i in this.modifiers) {
-      this.modifiers[i]()
-    }
-  }
-  DomBuilder.prototype.useValidation = function() {
-    this.modifiers.push(validator.bind(this))
+  // DomBuilder.prototype.doModifiers = function(){
+  //   for (var i in this.modifiers) {
+  //     this.modifiers[i]()
+  //   }
+  // }
+  DomBuilder.prototype.applyValidation = function() {
+    // this.modifiers.push(validator.bind(this))
+    this.model = new Connected({})
+    this.model._new_property_ = ['_valid_', false]
+    var builder = this
     var done_for = ['input','textarea']
-    var model = new Connected({})
 
-    function validator(){
-      var child = this.el.firstChild
-      while (child) {
-        if (done_for.indexOf(child.tagName.toLowerCase()) != -1 && child.name) {
-          model._new_property_ = [child.name, '']
-          child.addEventListener('input',listener.bind(child))
-        }
-        child = child.nextSibling
+    var child = this.el.firstChild
+    while (child) {
+      if (done_for.indexOf(child.tagName.toLowerCase()) != -1 && child.name) {
+        this.model._new_property_ = [child.name, '']
+        child.addEventListener('input',listener.bind(child))
       }
-      function listener(){ model[this.name] = this.value }
+      child = child.nextSibling
     }
+    function listener(){ builder.model[this.name] = this.value }
   }
 
 
 
   /* Takes a CSS selector-style string and generates corresponding real DOM element. */
 
-  function elFromString(desc){
-    var el=null, tag='', id='', classes=[], regex=null, matches=true, properties={}
+  function parseElementString(desc){
+    var el=null, tag='', id='', classes=[], regex=null, matches=true, properties=[], tokens, validate=false, helpers
+    var special_words = ['validate']
 
     if (/#/g.test(desc) && /#/g.test(desc).length > 1)
       throw new Error("HTML descriptor cannot contain multiple id's: "+desc)
@@ -199,24 +200,50 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     if (! /^\w/g.test(desc))
       throw new Error("Descriptor doesn't begin with a tag name: "+desc)
 
-    regex = /\[(\w+)=["']([^'"]*)["']\]/g
-    while ((matches = regex.exec(desc))) {
-      properties[matches[1]] = matches[2]
-    }
-    regex = /\[(\w+)\]/g
-    while ((matches = regex.exec(desc))) {
-      properties[matches[1]] = true
-    }
+    tokens = desc.match(/(?:[^\s"']+|['"][^"']*['"])+/g).slice(1)
 
-    tag = /^(h[1-6]|[a-z]+)/g.exec(desc)[1]
+    validate = tokens.indexOf('validate') !== -1
 
-    id = /#[^.]+/g.test(desc) ? /#([^.]+)/g.exec(desc)[1] : null
 
-    regex = /\.([\w-]+)/g
-    while ((matches = regex.exec(desc))) {
-      // console.log('CLASS', matches[1])
-      classes.push(matches[1])
+    if (/^[\w-]+(#[\w-]+)?(\.[\w-]+)*/.test(desc)) {
+
+      tag = /^[\w-]+/.exec(desc)[0]
+
+      id = /#[^.]+/g.test(desc) ? (/#([^.]+)/g).exec(desc)[1] : null
+
+      classes = desc.split(' ')[0].split('.').slice(1)
     }
+    else throw new Error('No tagName found in HTML descriptor: '+desc)
+
+
+    tokens.map(function(string, id){ //console.log(id, string)
+      switch (true) {
+        case (/^\d+$/.test(string)):
+          break;
+
+        case (/^(\w[\w.]*)=["']([^'"]*)["']$/.test(string)):
+
+          var property_path
+          matches = /^([\w.]+)=["']([^'"]*)["']$/.exec(string)
+          property_path = matches[1].split('.')
+          property_path.push( matches[2] )
+          properties.push( property_path )
+          break;
+
+        case (/^[\w-]+$/.test(string)):
+          matches = /^[\w-]+$/.exec(string)
+          if (special_words.indexOf(matches[1]) !== -1) properties.push( [matches[1], true] )
+          break;
+
+        case (/^\w\([^)]+\)$/.test(string)):
+          if (! helpers) helpers = []
+          helpers.push(string)
+          break;
+
+        default: throw new Error('Invalid token in HTML descriptor: '+string)
+      }
+    })
+
 
     el = document.createElement(tag)
     if (classes.length)
@@ -224,16 +251,28 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     if (id)
       el.id = id
 
-    Object.keys(properties).map(function(prop){
-      // console.log('ATTR', prop, properties[prop])
-      el[prop] = properties[prop]
+    // A property path is an array where each subsequent item is the value of the previous property on the parent.
+    // This allows us to set nested properties defined as a string, like "style.display='block'".
+    properties.forEach(function(prop_path){
+      // var logit
+      // if (prop_path[0] == 'style') { console.log( 'PROCESS PROPERTY PATH:', prop_path ); logit = true }
+
+      var property = properties[prop_path]
+      prop_path.reduce(function(parent, child){ //if (logit) console.log(parent, child)
+        if (prop_path.indexOf(child) === prop_path.length-2) {
+          parent[child] = prop_path.pop()
+        } else {
+          return parent[child]
+        }
+      }, el)
+
     })
 
-    return el
+    return { el:el, validate:validate, helpers:helpers }
   }
 
 
-  function elDefinitionValidate(el_str){
+  function elDefinitionValidate(el_str){ return true
     if (/\s/g.test(el_str) && el_str.match(/\s/g).length > 1) {
       throw new Error('Invalid DOM object definition. Cannot have more than one space character.')
       return false

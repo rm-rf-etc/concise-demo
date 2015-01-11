@@ -62,73 +62,48 @@ http://inimino.org/~inimino/blog/javascript_semicolons
           // Connected.bind(signup_mdl,'pass',validForm)
           // Connected.bind(signup_mdl,'_pass',validForm)
           o.dom = {
-            "form#register":function(o){
+            "form 1 validate":function(o){
               signup_form_el = this
-              o.useValidation()
               o.dom = {
-                "label1[innerHTML='Email']":0,
-                "input1[type='email'][name='name'][pattern='^\\w+@\\w+\\.[\\w.]+[^.]$'][required]":0,
-                "label2[innerHTML='Confirm Email']":0,
-                "input2[type='email'][name='_name'][required]":0,
-                "label3[innerHTML='Password']":0,
-                "input3[type='password'][name='pass'][required]":0,
-                "label4[innerHTML='Confirm Password']":0,
-                "input4[type='password'][name='_pass'][required]":0,
-                // "label1":function(){ this.innerHTML = 'Email' },
-                // "input1[type='email'][pattern='^\\w+@\\w+\\.[\\w.]+[^.]$'][required]":function(){
-                //   var self = this
-                //   this.addEventListener('input',function(ev){ signup_mdl.name = self.value })
-                // },
-                // "label2":function(){ this.innerHTML = 'Confirm Email' },
-                // "input2[type='email'][required]":function(){
-                //   var self = this
-                //   this.addEventListener('input',function(){ signup_mdl._name = self.value })
-                // },
-                // "label3":function(){ this.innerHTML = 'Password' },
-                // "input3[type='password'][required]":function(){
-                //   var self = this
-                //   this.addEventListener('input',function(){ signup_mdl.pass = self.value })
-                // },
-                // "label4":function(){ this.innerHTML = 'Confirm Password' },
-                // "input4[type='password'][required]":function(){
-                //   var self = this
-                //   this.addEventListener('input',function(){ signup_mdl._pass = self.value })
-                // },
-                "button.left[innerHTML='Sign-In']":function(){
-                  this.addEventListener('click',function(ev){ ev.preventDefault()
-                    signup_form_el.style.display = 'none'
-                    signin_form_el.style.display = 'block'
-                  })
-                },
-                "button.right[innerHTML='Submit']":function(){
-                  this.addEventListener('click',function(ev){ ev.preventDefault()
-                    window.alert('Not implemented yet.')
-                  })
-                }
+              "label innerHTML='Email'":0,
+              "input type='email' name='name' pattern='^\\w+@\\w+\\.[\\w.]+[^.]$' required":0,
+              "label innerHTML='Confirm Email'":0,
+              "input type='email' name='_name' required":0,
+              "label innerHTML='Password'":0,
+              "input type='password' name='pass' required":0,
+              "label innerHTML='Confirm Password'":0,
+              "input type='password' name='_pass' required":0,
+              "button.left innerHTML='Sign-In'":function(){
+                this.addEventListener('click',function(ev){ ev.preventDefault()
+                  signup_form_el.style.display = 'none'
+                  signin_form_el.style.display = 'block'
+                })
+              },
+              "button.right innerHTML='Submit'":function(o){
+                this.addEventListener('click',function(ev){ ev.preventDefault()
+                  window.alert('Is valid?', o.model._valid_)
+                })
               }
-            },
-            "form#login":function(o){
+            }},
+            "form 2 validate style.display='none' validate":function(o){
               signin_form_el = this
-              this.style.display = 'none'
-              o.useValidation()
               o.dom = {
-                "label1[innerHTML='Email']":0,
-                "input1[type='email'][name='name'][required][pattern='^\\w+@\\w+\\.[\\w.]+[^.]$']":0,
-                "label2[innerHTML='Password']":0,
-                "input2[type='password'][name='pass'][required]":0,
-                "button.left[innerHTML='Sign-Up']":function(){
-                  this.addEventListener('click',function(ev){ ev.preventDefault()
-                    signin_form_el.style.display = 'none'
-                    signup_form_el.style.display = 'block'
-                  })
-                },
-                "button.right[innerHTML='Submit']":function(){
-                  this.addEventListener('click',function(ev){ ev.preventDefault()
-                    window.alert('Not implemented yet.')
-                  })
-                }
+              "label innerHTML='Email'":0,
+              "input type='email' name='name' required pattern='^\\w+@\\w+\\.[\\w.]+[^.]$'":0,
+              "label innerHTML='Password'":0,
+              "input type='password' name='pass' required":0,
+              "button.left innerHTML='Sign-Up'":function(){
+                this.addEventListener('click',function(ev){ ev.preventDefault()
+                  signin_form_el.style.display = 'none'
+                  signup_form_el.style.display = 'block'
+                })
+              },
+              "button.right innerHTML='Submit'":function(){
+                this.addEventListener('click',function(ev){ ev.preventDefault()
+                  window.alert('Not implemented yet.')
+                })
               }
-            }
+            }}
           }
         }
       }
@@ -137,3 +112,25 @@ http://inimino.org/~inimino/blog/javascript_semicolons
   })
 
 })();
+
+
+  // "label1":function(){ this.innerHTML = 'Email' },
+  // "input1[type='email'][pattern='^\\w+@\\w+\\.[\\w.]+[^.]$'][required]":function(){
+  //   var self = this
+  //   this.addEventListener('input',function(ev){ signup_mdl.name = self.value })
+  // },
+  // "label2":function(){ this.innerHTML = 'Confirm Email' },
+  // "input2[type='email'][required]":function(){
+  //   var self = this
+  //   this.addEventListener('input',function(){ signup_mdl._name = self.value })
+  // },
+  // "label3":function(){ this.innerHTML = 'Password' },
+  // "input3[type='password'][required]":function(){
+  //   var self = this
+  //   this.addEventListener('input',function(){ signup_mdl.pass = self.value })
+  // },
+  // "label4":function(){ this.innerHTML = 'Confirm Password' },
+  // "input4[type='password'][required]":function(){
+  //   var self = this
+  //   this.addEventListener('input',function(){ signup_mdl._pass = self.value })
+  // },
