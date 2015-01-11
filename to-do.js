@@ -54,7 +54,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
             'input[type="submit"]':0
           }})
         },
-        'ul each(models.list)':a.forEachItem(function(a){return{
+        'ul|each(models.list)':a.forEachItem(function(a){return{
           'li':{
             'input[type="checkbox"]':a.inputCheckbox,
             'button.delete-this':a.deleteItemButton,

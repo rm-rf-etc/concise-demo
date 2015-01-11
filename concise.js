@@ -35,6 +35,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
   window.concise = new Concise()
   var DEFINE = Object.defineProperty
+  var _current_modifiers_
 
 
   /*
@@ -43,9 +44,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
   */
 
-  function Concise(){
-    // this.models = new Connected({})
-  }
+  function Concise(){}
 
   Concise.prototype.controllers = {}
 
@@ -61,6 +60,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
   function DomBuilder(el){
     this.el = el
+    this.modifiers = []
   }
   DEFINE(DomBuilder.prototype, 'view', {enumerable:false, configurable:false,
     set:function(el){
@@ -83,7 +83,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
 
         if (elDefinitionValidate(key)) {
-          el_str = key.split(' ')[0]
+          el_str = key.split('|')[0]
           el = elFromString(el_str)
         }
         else return
@@ -110,22 +110,20 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
           helper_fn(builder,data,value)
           this.el.appendChild(el)
           // this.maintainer.include(el_str, el)
-          this.just_added = el
         }
         else if (typeOf(value) === 'Object') {
           builder.dom = value
           this.el.appendChild(el)
           // this.maintainer.include(el_str, el)
-          this.just_added = el
         }
         else if (typeOf(value) === 'Function') {
           value.call(el,builder)
           this.el.appendChild(el)
           // this.maintainer.include(el_str, el)
-          this.just_added = el
         }
 
       }.bind(this))
+      this.doModifiers()
     }
   })
   // DEFINE(DomBuilder.prototype, 'maintainer', {enumerable:false, configurable:false,
@@ -165,6 +163,31 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
 
 
+  DomBuilder.prototype.doModifiers = function(){
+    for (var i in this.modifiers) {
+      this.modifiers[i]()
+    }
+  }
+  DomBuilder.prototype.useValidation = function() {
+    this.modifiers.push(validator.bind(this))
+    var done_for = ['input','textarea']
+    var model = new Connected({})
+
+    function validator(){
+      var child = this.el.firstChild
+      while (child) {
+        if (done_for.indexOf(child.tagName.toLowerCase()) != -1 && child.name) {
+          model._new_property_ = [child.name, '']
+          child.addEventListener('input',listener.bind(child))
+        }
+        child = child.nextSibling
+      }
+      function listener(){ model[this.name] = this.value }
+    }
+  }
+
+
+
   /* Takes a CSS selector-style string and generates corresponding real DOM element. */
 
   function elFromString(desc){
@@ -176,7 +199,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     if (! /^\w/g.test(desc))
       throw new Error("Descriptor doesn't begin with a tag name: "+desc)
 
-    regex = /\[(\w+)=["'](.*?)["']\]/g
+    regex = /\[(\w+)=["']([^'"]*)["']\]/g
     while ((matches = regex.exec(desc))) {
       properties[matches[1]] = matches[2]
     }
