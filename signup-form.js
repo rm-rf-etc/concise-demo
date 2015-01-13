@@ -96,11 +96,11 @@ http://inimino.org/~inimino/blog/javascript_semicolons
               o.dom = {
               "label innerHTML='Email'":0,
               "input type='email' name='name' required pattern='^\\w+@\\w+\\.[\\w.]+[^.]$'":function(o){
-                o.use([validEmail('name'), emailsMatch])
+                o.validateWith([validEmail('name'), emailsMatch])
               },
               "label innerHTML='Password'":0,
               "input type='password' name='pass' required":function(o){
-                o.use([validPassword('pass'), passwordsMatch])
+                o.validateWith([validPassword('pass'), passwordsMatch])
               },
               "button.left innerHTML='Sign-Up'":function(){
                 this.addEventListener('click',function(ev){ ev.preventDefault()

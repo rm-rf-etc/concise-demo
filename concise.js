@@ -61,6 +61,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   function DomBuilder(parent, el){
     this.el = el
     this.parent = parent
+    this._validations = []
   }
   DEFINE(DomBuilder.prototype, 'view', {enumerable:false, configurable:false,
     set:function(el){
@@ -85,16 +86,15 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         if (elDefinitionValidate(key)) {
           el_str = key.split('|')[0]
           parsed = parseElementString(el_str)
-          // console.log( 'PARSED', parsed )
           el = parsed.el
         }
         else return
 
         if (! value) {
           this.el.appendChild(el)
-          // this.maintainer.include(el_str, el)
           return
         }
+
         builder = new DomBuilder(this, el)
 
         if (parsed.helpers) {
@@ -117,8 +117,9 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
           // this.maintainer.include(el_str, el)
         }
         else if (typeOf(value) === 'Function') {
+          if (parsed.validate) builder.hasValidation = true
           value.call(el,builder)
-          if (parsed.validate && el.tagName === 'FORM') builder.formValidate(el)
+          if (parsed.validate && el.tagName === 'FORM') builder.formValidate()
           this.el.appendChild(el)
           // this.maintainer.include(el_str, el)
         }
@@ -131,23 +132,38 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     get:function(){ return this._model || this.parent.model }
   })
 
+  DomBuilder.prototype.validation = function(validation){
+    if (this.hasValidation) this._validations.push(validation)
+    else this.parent.validation( validation )
+  }
+
   DomBuilder.prototype.validateWith = function(validations){
     var self = this
-    self.el.addEventListener('input',function(){
-      self.el.validity = validations.reduce(function(last, next){ return last && next.apply(self.model) }, true)
-      console.log('THEN UPDATE VALIDITY')
+    var state
+
+    self.validation(function(){
+      // console.log( 'VALIDATION SETUP', self.model, 'NAME:', self.el.name )
+
+      Connected.bind(self.model, self.el.name, function(){
+        state = validations.reduce(function(last, next){
+          console.log(last, next.apply(self.model))
+          return last && next.apply(self.model)
+        }, true)
+        console.log('VALID?', state, 'THEN UPDATE VALIDITY')
+      })
+
     })
     // console.log('VALIDATIONS RECEIVED', this.el, validations)
   }
 
-  DomBuilder.prototype.formValidate = function(el){ console.log( 'FORMVALIDATE', this )
+  DomBuilder.prototype.formValidate = function(){ console.log( 'FORMVALIDATE', this )
     this._model = new Connected({})
     var model = this._model
     var builder = this
     var done_for = ['input','textarea']
     model._new_property_ = ['_valid_', false]
 
-    var child = el.firstChild
+    var child = this.el.firstChild
     while (child) {
       if (done_for.indexOf(child.tagName.toLowerCase()) != -1 && child.name) {
         model._new_property_ = [child.name, '']
@@ -156,6 +172,8 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
       child = child.nextSibling
     }
     function listener(){ model[this.name] = this.value }
+
+    this._validations.map(function(fn){ fn() })
   }
 
 
