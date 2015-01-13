@@ -142,11 +142,16 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     var state
 
     self.validation(function(){
+
+      /*
+      Still left to do: figure out how to nicely mark both fields as valid.
+      */
+
       // console.log( 'VALIDATION SETUP', self.model, 'NAME:', self.el.name )
 
       Connected.bind(self.model, self.el.name, function(){
         state = validations.reduce(function(last, next){
-          console.log(last, next.apply(self.model))
+          // console.log(last, next.apply(self.model))
           return last && next.apply(self.model)
         }, true)
         console.log('VALID?', state, 'THEN UPDATE VALIDITY')
