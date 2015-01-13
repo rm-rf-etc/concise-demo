@@ -58,9 +58,9 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     constructor.call(this,builder)
   }
 
-  function DomBuilder(el){
+  function DomBuilder(parent, el){
     this.el = el
-    this.models = []
+    this.parent = parent
   }
   DEFINE(DomBuilder.prototype, 'view', {enumerable:false, configurable:false,
     set:function(el){
@@ -71,7 +71,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     }
   })
   DEFINE(DomBuilder.prototype, 'dom', {enumerable:false, configurable:false,
-    set:function(structure){ console.log(typeOf(structure), structure)
+    set:function(structure){ //console.log(typeOf(structure), structure)
       if (! familyOf(this.el)) throw new Error('Missing valid view element. Cannot build a DOM before doing `o.view = document.querySelector(<your_selector>)`.')
       if (typeOf(structure) !== 'Object') throw new Error('Invalid dom structure object.')
 
@@ -85,7 +85,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         if (elDefinitionValidate(key)) {
           el_str = key.split('|')[0]
           parsed = parseElementString(el_str)
-          console.log( 'PARSED', parsed )
+          // console.log( 'PARSED', parsed )
           el = parsed.el
         }
         else return
@@ -95,8 +95,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
           // this.maintainer.include(el_str, el)
           return
         }
-        builder = new DomBuilder(el)
-        if (this.model) builder.model = this.model
+        builder = new DomBuilder(this, el)
 
         if (parsed.helpers) {
           // if (typeOf(value) !== 'Function') throw new Error('DOM object "'+key+'" defined with helper method but has no function upon which to apply it.')
@@ -119,62 +118,33 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         }
         else if (typeOf(value) === 'Function') {
           value.call(el,builder)
+          if (parsed.validate && el.tagName === 'FORM') builder.formValidate(el)
           this.el.appendChild(el)
           // this.maintainer.include(el_str, el)
         }
 
-        if (parsed.validate && el.tagName === 'FORM') this.applyValidation(el)
       }.bind(this))
     }
   })
-  // DEFINE(DomBuilder.prototype, 'maintainer', {enumerable:false, configurable:false,
-  //   get:function(){ return new DomMaintainer(this) }
-  // })
 
-
-  // function DomMaintainer(el){
-  //   this.el = el
-  //   this.structure = {}
-  // }
-  // DEFINE(DomMaintainer.prototype, 'include', {enumerable:false, configurable:false,
-  //   value:function(el_str, el){ this.structure[el_str] = el }
-  // })
-  // DEFINE(DomMaintainer.prototype, 'dom', {enumerable:false, configurable:false,
-  //   set:function(structure){
-  //     Object.keys(structure).map(function(key){
-  //       // console.log('DomMaintainer.dom = ',structure)
-  //       // console.log('this.el',this.el)
-  //       var el
-  //       var faker = new DomProxy(el)
-  //       if (elDefinitionValidate(key) && key in this.structure) {
-  //         el = this.structure[key]
-  //         fn.call(faker, this)
-  //       }
-  //     }.bind(this))
-  //   }
-  // })
-
-  function DomProxy(el){
-    this.el = el
-  }
-  DomProxy.prototype.addEventListener = function(){}
-  DEFINE(DomProxy.prototype, 'value', { configurable:false, enumerable:false,
-    set:function(val){ this.el.value = val }
+  DEFINE(DomBuilder.prototype, 'model', {enumerable:false, configurable:false, set:function(){},
+    get:function(){ return this._model || this.parent.model }
   })
 
+  DomBuilder.prototype.use = function(validations){
+    var self = this
+    self.el.addEventListener('input',function(){
+      self.el.validity = validations.reduce(function(last, next){ return last && next.apply(self.model) }, true)
+      console.log('THEN UPDATE VALIDITY')
+    })
+    // console.log('VALIDATIONS RECEIVED', this.el, validations)
+  }
 
-
-  // DomBuilder.prototype.doModifiers = function(){
-  //   for (var i in this.modifiers) {
-  //     this.modifiers[i]()
-  //   }
-  // }
-  DomBuilder.prototype.applyValidation = function(el){
-    // this.modifiers.push(validator.bind(this))
-    var model = new Connected({})
+  DomBuilder.prototype.formValidate = function(el){ console.log( 'FORMVALIDATE', this )
+    this._model = new Connected({})
+    var model = this._model
     var builder = this
     var done_for = ['input','textarea']
-    this.models.push( model )
     model._new_property_ = ['_valid_', false]
 
     var child = el.firstChild
