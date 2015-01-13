@@ -65,19 +65,19 @@ http://inimino.org/~inimino/blog/javascript_semicolons
               o.dom = {
               "label innerHTML='Email'":0,
               "input type='email' name='name' pattern='^\\w+@\\w+\\.[\\w.]+[^.]$' required":function(o){
-                o.use([validEmail('name'), emailsMatch])
+                o.validateWith([validEmail('name'), emailsMatch])
               },
               "label innerHTML='Confirm Email'":0,
               "input type='email' name='_name' required":function(o){
-                o.use([validEmail('_name'), emailsMatch])
+                o.validateWith([validEmail('_name'), emailsMatch])
               },
               "label innerHTML='Password'":0,
               "input type='password' name='pass' required":function(o){
-                o.use([validPassword('pass'), passwordsMatch])
+                o.validateWith([validPassword('pass'), passwordsMatch])
               },
               "label innerHTML='Confirm Password'":0,
               "input type='password' name='_pass' required":function(o){
-                o.use([validPassword('_pass'), passwordsMatch])
+                o.validateWith([validPassword('_pass'), passwordsMatch])
               },
               "button.left innerHTML='Sign-In'":function(){
                 this.addEventListener('click',function(ev){ ev.preventDefault()

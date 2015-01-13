@@ -131,7 +131,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     get:function(){ return this._model || this.parent.model }
   })
 
-  DomBuilder.prototype.use = function(validations){
+  DomBuilder.prototype.validateWith = function(validations){
     var self = this
     self.el.addEventListener('input',function(){
       self.el.validity = validations.reduce(function(last, next){ return last && next.apply(self.model) }, true)
