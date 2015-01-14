@@ -60,7 +60,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
     function matches(prop1, prop2, el1, el2){
       var msg
       return function(){
-        msg = this[prop1] === this[prop2] ? '' : 'Email entries do not match.'
+        msg = this[prop1] === this[prop2] ? '' : 'Entries do not match.'
         el1.setCustomValidity( msg )
         el2.setCustomValidity( msg )
         console.log( 'VALIDITY FOR', el1.name, 'AND', el2.name, ':', el1.checkValidity(), el2.checkValidity() )
