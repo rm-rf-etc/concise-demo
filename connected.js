@@ -63,7 +63,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
       return new BindableObject(data)
   }
 
-  function bind(){ // console.log('BIND', arguments)
+  function bind(){ //console.log('BIND', arguments)
     var setter_cb, property, parent, opts
 
     opts = Array.prototype.slice.call(arguments)
@@ -107,6 +107,12 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   DEFINE(BindableObject.prototype, 'bind', { enumerable:false, configurable:false, value:bind })
   DEFINE(BindableObject.prototype, 'unbind', { enumerable:false, configurable:false, value:unbind })
   DEFINE(BindableObject.prototype, 'recompute', { enumerable:false, configurable:false, value:recompute })
+  DEFINE(BindableObject.prototype, 'onChange', { enumerable:false, configurable:false,
+    value:function(props, cb){
+      if (typeOf(props) !== 'Array') return
+      props.forEach(function(prop){ bind(this,prop,cb) }.bind(this))
+    }
+  })
   DEFINE(BindableObject.prototype, '_new_property_', { enumerable:false, configurable:false,
     set:function(){ addProperty.apply(this, arguments) }
   })

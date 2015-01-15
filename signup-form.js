@@ -57,76 +57,99 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
     o.view = document.querySelector('#view')
 
-    function matches(prop1, prop2, el1, el2){
-      var msg
-      return function(){
-        msg = this[prop1] === this[prop2] ? '' : 'Entries do not match.'
-        el1.setCustomValidity( msg )
-        el2.setCustomValidity( msg )
-        console.log( 'VALIDITY FOR', el1.name, 'AND', el2.name, ':', el1.checkValidity(), el2.checkValidity() )
-      }
+    function compare(model, prop1, prop2){
+      return function(){ return model[prop1] === model[prop2] }
     }
 
     o.dom = {
     "row.width-12.column":{
-      "section.width-6.centered":function(o){
+      "section.width-6.centered":
+      function(o){
         var signup_form_el
         var signin_form_el
-        var un_o
-        var pw_o
-        var _un_o
-        var _pw_o
+        var confirm_username_el
+        var confirm_password_el
+
         o.dom = {
-        "form 1 validate":function(o){
+        "form 1 validate":
+        function(o){
           signup_form_el = this
+
           o.dom = {
           "label innerHTML='Email'":0,
-          "input type='email' name='name' pattern='^\\w+@\\w+\\.[\\w.]+[^.]$' required":function(o){ un_o = o },
+          "input type='email' name='name' pattern='^\\w+@\\w+\\.[\\w.]+[^.]$' required":0,
           "label innerHTML='Confirm Email'":0,
-          "input type='email' name='_name' required":function(o){ _un_o = o },
+          "input type='email' name='_name' required":
+          function(o){
+            confirm_username_el = this
+          },
+
           "label innerHTML='Password'":0,
-          "input type='password' name='pass' required":function(o){ pw_o = o },
+          "input type='password' name='pass' required":0,
           "label innerHTML='Confirm Password'":0,
-          "input type='password' name='_pass' required":function(o){ _pw_o = o },
-          "button.left innerHTML='Sign-In'":function(){
-            this.addEventListener('click',function(ev){
+          "input type='password' name='_pass' required":
+          function(o){
+            confirm_password_el = this
+          },
+
+          "button.left innerHTML='Sign-In'":
+          function(o){
+            o.onClick(function(ev){
               ev.preventDefault()
               signup_form_el.style.display = 'none'
               signin_form_el.style.display = 'block'
             })
           },
-          "button.right innerHTML='Submit'":function(o){
-            this.addEventListener('click',function(ev){
+
+          "button.right innerHTML='Submit'":
+          function(o){
+            o.onClick(function(ev){
               ev.preventDefault()
-              window.alert('Is valid?', o.model._valid_)
+              window.alert('Is valid?', o.el.checkValidity())
             })
           }}
-          un_o.validateWith( [ matches('name', '_name', un_o.el, _un_o.el) ] )
-          _un_o.validateWith( [ matches('name', '_name', un_o.el, _un_o.el) ] )
 
-          pw_o.validateWith( [ matches('pass', '_pass', pw_o.el, _pw_o.el) ] )
-          _pw_o.validateWith( [ matches('pass', '_pass', un_o.el, _un_o.el) ] )
+
+          o.model.onChange([ 'name', '_name' ], function(){
+            confirm_username_el.setCustomValidity( compare(o.model,'name','_name') ? '' : 'Entries do not match.' )
+            console.log( signup_form_el.checkValidity() )
+          })
+
+          o.model.onChange([ 'pass', '_pass' ], function(){
+            confirm_password_el.setCustomValidity( compare(o.model,'pass','_pass') ? '' : 'Entries do not match.' )
+            console.log( signup_form_el.checkValidity() )
+          })
+
         },
-        "form 2 validate style.display='none' validate":function(o){
+
+        "form 2 validate style.display='none' validate":
+        function(o){
           signin_form_el = this
+
           o.dom = {
           "label innerHTML='Email'":0,
           "input type='email' name='name' required pattern='^\\w+@\\w+\\.[\\w.]+[^.]$'":0,
           "label innerHTML='Password'":0,
           "input type='password' name='pass' required":0,
-          "button.left innerHTML='Sign-Up'":function(){
-            this.addEventListener('click',function(ev){ ev.preventDefault()
+          "button.left innerHTML='Sign-Up'":
+          function(o){
+            o.onClick(function(ev){ ev.preventDefault()
               signin_form_el.style.display = 'none'
               signup_form_el.style.display = 'block'
             })
           },
-          "button.right innerHTML='Submit'":function(){
-            this.addEventListener('click',function(ev){ ev.preventDefault()
+
+          "button.right innerHTML='Submit'":
+          function(o){
+            o.onClick(function(ev){ ev.preventDefault()
               window.alert('Not implemented yet.')
             })
           }}
+
         }}
+
       }
+
     }}
 
   })
