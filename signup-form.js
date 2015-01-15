@@ -58,7 +58,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
     o.view = document.querySelector('#view')
 
     function compare(model, prop1, prop2){
-      return function(){ return model[prop1] === model[prop2] }
+      return model[prop1] === model[prop2]
     }
 
     o.dom = {
@@ -85,9 +85,9 @@ http://inimino.org/~inimino/blog/javascript_semicolons
           },
 
           "label innerHTML='Password'":0,
-          "input type='password' name='pass' required":0,
+          "input type='password' name='pass' pattern='.{5,20}' required":0,
           "label innerHTML='Confirm Password'":0,
-          "input type='password' name='_pass' required":
+          "input type='password' name='_pass' pattern='.{5,20}' required":
           function(o){
             confirm_password_el = this
           },
@@ -112,12 +112,12 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
           o.model.onChange([ 'name', '_name' ], function(){
             confirm_username_el.setCustomValidity( compare(o.model,'name','_name') ? '' : 'Entries do not match.' )
-            console.log( signup_form_el.checkValidity() )
+            console.log( o.el.checkValidity() )
           })
 
           o.model.onChange([ 'pass', '_pass' ], function(){
             confirm_password_el.setCustomValidity( compare(o.model,'pass','_pass') ? '' : 'Entries do not match.' )
-            console.log( signup_form_el.checkValidity() )
+            console.log( o.el.checkValidity() )
           })
 
         },
