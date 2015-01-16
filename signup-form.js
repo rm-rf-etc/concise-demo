@@ -47,8 +47,8 @@ http://inimino.org/~inimino/blog/javascript_semicolons
       "section.width-6.centered":function(o){
         var signup_form_el
         var signin_form_el
-        var confirm_username_el
-        var confirm_password_el
+        var name_conf_o
+        var pass_conf_o
 
         o.dom = {
         "form 1 validate":function(o){
@@ -59,13 +59,13 @@ http://inimino.org/~inimino/blog/javascript_semicolons
           "input type='email' name='name' pattern='^\\w+@\\w+\\.[\\w.]+[^.]$' required":0,
           "label innerHTML='Confirm Email'":0,
           "input type='email' name='_name' required":function(o){
-            confirm_username_el = this
+            name_conf_o = o
           },
           "label innerHTML='Password'":0,
           "input type='password' name='pass' pattern='.{5,20}' required":0,
           "label innerHTML='Confirm Password'":0,
           "input type='password' name='_pass' pattern='.{5,20}' required":function(o){
-            confirm_password_el = this
+            pass_conf_o = o
           },
           "button.left innerHTML='Sign-In'":function(o){
             o.onClick(function(ev){
@@ -82,18 +82,16 @@ http://inimino.org/~inimino/blog/javascript_semicolons
           }}
 
 
-          var test_un = getComparator(o.model,'name','_name')
+          var test_name = getComparator(o.model,'name','_name')
+          var test_pass = getComparator(o.model,'pass','_pass')
+
 
           o.model.onChange([ 'name', '_name' ], function(){
-            confirm_username_el.setCustomValidity( test_un() ? '' : 'Entries do not match.' )
-            console.log( o.el.checkValidity() )
+            name_conf_o.setValid( test_name(), 'Entries do not match.' ); console.log( o.el.checkValidity() )
           })
 
-          var test_pw = getComparator(o.model,'pass','_pass')
-
           o.model.onChange([ 'pass', '_pass' ], function(){
-            confirm_password_el.setCustomValidity( test_pw() ? '' : 'Entries do not match.' )
-            console.log( o.el.checkValidity() )
+            pass_conf_o.setValid( test_pass(), 'Entries do not match.' ); console.log( o.el.checkValidity() )
           })
 
         },

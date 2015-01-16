@@ -144,6 +144,10 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     this.el.addEventListener('input',cb)
   }
 
+  DomBuilder.prototype.setValid = function(bool, string){
+    this.el.setCustomValidity( bool ? '' : string )
+  }
+
   DomBuilder.prototype.formValidate = function(){
     console.log( 'FORM VALIDATE', this )
 
