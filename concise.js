@@ -88,9 +88,9 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
         if (elDefinitionValidate(key)) {
           parsed = parseElementString(key)
-          console.log( 'VALIDATE', parsed.validate )
           if (parsed.validate) this.validates = true
           el = parsed.el
+          // console.log( 'USES VALIDATION', parsed.validate )
         }
         else return
 
@@ -175,7 +175,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
   function parseElementString(desc){
     var el=null, tag='', id='', classes=[], regex=null, matches=true, properties=[], tokens, validate=false, helpers
-    var special_words = ['validate']
+    var keywords = ['validate']
 
     if (/#/g.test(desc) && /#/g.test(desc).length > 1)
       throw new Error("HTML descriptor cannot contain multiple id's: "+desc)
@@ -200,12 +200,13 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
 
     tokens.map(function(string, id){ //console.log(id, string)
+      // console.log( 'TOKEN', string )
       switch (true) {
-        case (/^\d+$/.test(string)):
+
+        case (/^\d+$/.test(string)): //console.log('case',1)
           break;
 
-        case (/^(\w[\w.]*)=["']([^'"]*)["']$/.test(string)):
-
+        case (/^(\w[\w.]*)=["']([^'"]*)["']$/.test(string)): //console.log('case',2)
           var property_path
           matches = /^([\w.]+)=["']([^'"]*)["']$/.exec(string)
           property_path = matches[1].split('.')
@@ -213,12 +214,12 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
           properties.push( property_path )
           break;
 
-        case (/^[\w-]+$/.test(string)):
+        case (/^[\w-]+$/.test(string)): //console.log('case',3)
           matches = /^[\w-]+$/.exec(string)
-          if (special_words.indexOf(matches[1]) !== -1) properties.push( [matches[1], true] )
+          if (keywords.indexOf(matches[0]) === -1) properties.push( [matches[0], true] )
           break;
 
-        case (/^\w\([^)]+\)$/.test(string)):
+        case (/^\w\([^)]+\)$/.test(string)): //console.log('case',4)
           if (! helpers) helpers = []
           helpers.push(string)
           break;
