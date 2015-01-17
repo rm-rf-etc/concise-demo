@@ -45,23 +45,38 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   */
 
   function Concise(){
+    this.current_view = null
     var view = document.createElement('view')
     var body = document.querySelector('body')
-    body.insertBefore( view, body.firstChild )
+    body.insertBefore(view, body.firstChild)
 
-    this.view = view
+    this.view_body = view
   }
 
-  Concise.prototype.controllers = {}
+  Concise.prototype.setView = function(view){
+    if (this.current_view) this.view_body.removeChild(this.current_view)
+    this.current_view = view
+    this.view_body.appendChild(view)
+  }
+
+  Concise.prototype.routes = function(path, controller){
+    // body...
+  }
 
   Concise.prototype.helpers = Helpers()
 
-  Concise.prototype.controller = function(name, constructor){
-    concise.controllers[name] = constructor
+  Concise.prototype.Controller = function(name, constructor){
 
-    var builder = new DomBuilder(null, this.view)
+    var view = document.createElement('div')
+    view.id = name || Math.random().toString().split('.')[1]
+
+    var builder = new DomBuilder(null, view)
 
     constructor.call(this,builder)
+
+    return function(){
+      concise.setView( view )
+    }
   }
 
 
@@ -71,14 +86,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     this.parent = parent || {}
     this.validates = false
   }
-  // DEFINE(DomBuilder.prototype, 'view', {enumerable:false, configurable:false,
-  //   set:function(el){
-  //     if (!el || ! el instanceof HTMLElement)
-  //       throw new Error('View object must be an HTML Element. Try using `o.view = document.querySelector(<your_selector>)`.')
-  //     else
-  //       this.el = el
-  //   }
-  // })
+
   DEFINE(DomBuilder.prototype, 'dom', {enumerable:false, configurable:false,
     set:function(structure){
       //console.log(typeOf(structure), structure)

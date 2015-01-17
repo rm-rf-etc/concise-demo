@@ -34,7 +34,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
 ;(function(){
 
-  concise.controller('home',function(o){
+  var HomeCtrl = new concise.Controller('home', function(o){
 
     function getComparator(model, prop1, prop2){
       return function(){ return model[prop1] === model[prop2] }
@@ -120,5 +120,10 @@ http://inimino.org/~inimino/blog/javascript_semicolons
     }}
 
   })
+
+  concise.routes
+  ('/', HomeCtrl)
+
+  window.HomeCtrl = HomeCtrl
 
 })();
