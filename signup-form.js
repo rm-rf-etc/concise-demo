@@ -36,8 +36,6 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
   concise.controller('home',function(o){
 
-    o.view = document.querySelector('#view')
-
     function getComparator(model, prop1, prop2){
       return function(){ return model[prop1] === model[prop2] }
     }

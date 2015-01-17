@@ -44,7 +44,13 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
   */
 
-  function Concise(){}
+  function Concise(){
+    var view = document.createElement('view')
+    var body = document.querySelector('body')
+    body.insertBefore( view, body.firstChild )
+
+    this.view = view
+  }
 
   Concise.prototype.controllers = {}
 
@@ -53,7 +59,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   Concise.prototype.controller = function(name, constructor){
     concise.controllers[name] = constructor
 
-    var builder = new DomBuilder()
+    var builder = new DomBuilder(null, this.view)
 
     constructor.call(this,builder)
   }
@@ -65,14 +71,14 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     this.parent = parent || {}
     this.validates = false
   }
-  DEFINE(DomBuilder.prototype, 'view', {enumerable:false, configurable:false,
-    set:function(el){
-      if (!el || ! el instanceof HTMLElement)
-        throw new Error('View object must be an HTML Element. Try using `o.view = document.querySelector(<your_selector>)`.')
-      else
-        this.el = el
-    }
-  })
+  // DEFINE(DomBuilder.prototype, 'view', {enumerable:false, configurable:false,
+  //   set:function(el){
+  //     if (!el || ! el instanceof HTMLElement)
+  //       throw new Error('View object must be an HTML Element. Try using `o.view = document.querySelector(<your_selector>)`.')
+  //     else
+  //       this.el = el
+  //   }
+  // })
   DEFINE(DomBuilder.prototype, 'dom', {enumerable:false, configurable:false,
     set:function(structure){
       //console.log(typeOf(structure), structure)
