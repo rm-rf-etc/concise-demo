@@ -33,7 +33,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
 
 ;(function(){
 
-  window.concise = new Concise()
+  var concise = new Concise()
   var DEFINE = Object.defineProperty
   var _current_modifiers_
 
@@ -310,6 +310,12 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         buildDom()
       }
     }
+  }
+
+  if (typeof module !== 'undefined' && module.hasOwnProperty('exports')) {
+    module.exports = concise
+  } else {
+    window.concise = concise
   }
 
 })()
