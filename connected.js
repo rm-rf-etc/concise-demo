@@ -381,7 +381,16 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   function typeOf(thing){
     if (typeof thing === 'number') return isNaN(thing) ? 'NaN' : 'Number'
     else if (thing instanceof HTMLElement) return 'HTMLElement'
-    else return (thing !== null && thing !== undefined && thing.constructor) ? thing.constructor.name : '' + thing
+    else return (thing !== null && thing !== undefined && thing.constructor) ? getObjectClass(thing) : '' + thing
+  }
+
+  function getObjectClass(obj) {
+    if (obj && obj.constructor && obj.constructor.toString) {
+      var arr = obj.constructor.toString().match(/function\s+(\w+)/)
+
+      if (arr && arr.length == 2) return arr[1]
+    }
+    return undefined
   }
 
   var debounce
