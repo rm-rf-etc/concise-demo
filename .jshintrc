@@ -15,6 +15,7 @@
     "clearTimeout": false,
     "setTimeout": false,
     "require": false,
-    "HTMLElement": false
+    "HTMLElement": false,
+    "ActiveXObject": false
   }
 }

@@ -54,7 +54,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
           o.dom = {
           "label innerHTML='Email'":0,
-          "input type='email' name='name' pattern='^\\w+@\\w+\\.[\\w.]+[^.]$' required":0,
+          "input type='email' name='name' required":0, // Potentially could use: pattern='^\\w+@\\w+\\.[\\w.]+[^.]$'
           "label innerHTML='Confirm Email'":0,
           "input type='email' name='_name' required":function(o){
             name_conf_o = o
@@ -75,7 +75,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
           "button.right innerHTML='Submit'":function(o){
             o.onClick(function(ev){
               ev.preventDefault()
-              window.alert('Is valid?', o.el.checkValidity())
+              window.alert('Form is valid? '+signup_form_el.checkValidity())
             })
           }}
 
@@ -85,11 +85,11 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
 
           o.model.onChange([ 'name', '_name' ], function(){
-            name_conf_o.setValid( test_name(), 'Entries do not match.' ); console.log( o.el.checkValidity() )
+            name_conf_o.setValid( test_name(), 'Entries do not match.' ); console.log( 'Sign-up form is valid? '+o.el.checkValidity() )
           })
 
           o.model.onChange([ 'pass', '_pass' ], function(){
-            pass_conf_o.setValid( test_pass(), 'Entries do not match.' ); console.log( o.el.checkValidity() )
+            pass_conf_o.setValid( test_pass(), 'Entries do not match.' ); console.log( 'Sign-up form is valid? '+o.el.checkValidity() )
           })
 
         },
@@ -98,9 +98,9 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
           o.dom = {
           "label innerHTML='Email'":0,
-          "input type='email' name='name' required pattern='^\\w+@\\w+\\.[\\w.]+[^.]$'":0,
+          "input type='email' name='name' required":0,
           "label innerHTML='Password'":0,
-          "input type='password' name='pass' required":0,
+          "input type='password' name='pass' pattern='.{5,20}' required":0,
           "button.left innerHTML='Sign-Up'":function(o){
             o.onClick(function(ev){ ev.preventDefault()
               signin_form_el.style.display = 'none'
@@ -109,9 +109,13 @@ http://inimino.org/~inimino/blog/javascript_semicolons
           },
           "button.right innerHTML='Submit'":function(o){
             o.onClick(function(ev){ ev.preventDefault()
-              window.alert('Not implemented yet.')
+              window.alert('Form is valid? '+signin_form_el.checkValidity())
             })
           }}
+
+          o.model.onChange(['name', 'pass'], function(){
+            console.log( 'Sign-in form is valid? '+o.el.checkValidity() )
+          })
 
         }}
 
@@ -121,9 +125,11 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
   })
 
+  // This is just junk right now. Routing will be implemented soon.
   concise.routes
   ('/', HomeCtrl)
 
   window.HomeCtrl = HomeCtrl
+  HomeCtrl()
 
 })();
