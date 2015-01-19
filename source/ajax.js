@@ -5,6 +5,8 @@
  * @param object callback
  * @param mixed data
  * @param null x
+ *
+ * https://gist.github.com/Xeoncross/7663273
  */
 function ajax(url, callback, data, x){
   try {
