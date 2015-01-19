@@ -252,10 +252,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     // A property path is an array where each subsequent item is the value of the previous property on the parent.
     // This allows us to set nested properties defined as a string, like "style.display='block'".
     properties.forEach(function(prop_path){
-      // var logit
-      // if (prop_path[0] == 'style') { console.log( 'PROCESS PROPERTY PATH:', prop_path ); logit = true }
 
-      var property = properties[prop_path]
       prop_path.reduce(function(parent, child){ //if (logit) console.log(parent, child)
         if (prop_path.indexOf(child) === prop_path.length-2) {
           parent[child] = prop_path.pop()
