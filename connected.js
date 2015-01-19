@@ -385,12 +385,11 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
   }
 
   function getObjectClass(obj) {
-    if (obj && obj.constructor && obj.constructor.toString) {
-      var arr = obj.constructor.toString().match(/function\s+(\w+)/)
+    var string
+    if (obj.constructor && obj.constructor.toString) string = obj.constructor.toString()
+    else throw new Error('Object constructor does not have toString method.')
 
-      if (arr && arr.length == 2) return arr[1]
-    }
-    return undefined
+    return (/function\s+(\w+)/.test(string)) ? string.match(/function\s+(\w+)/)[1] : 'Anonymous Class'
   }
 
   var debounce
