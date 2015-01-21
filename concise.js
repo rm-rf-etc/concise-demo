@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 /*
 
-Semi-colons are just FUD. If your minifier can't handle this code, switch to one that is JS-compliant.
+Semi-colon line terminators are just FUD. If your minifier can't handle this code, switch to one that is JS-compliant.
 
 */
 
@@ -141,7 +141,7 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
         }
 
       }.bind(this))
-      // console.log(this.parent.validates, this.el.tagName)
+
       if (this.parent.validates && this.el.tagName === 'FORM') this.formValidate()
     }
   })
@@ -175,7 +175,8 @@ Semi-colons are just FUD. If your minifier can't handle this code, switch to one
     while (child) {
       if (done_for.indexOf(child.tagName.toLowerCase()) != -1 && child.name) {
         model._new_property_ = [child.name, '']
-        child.addEventListener('input',listener.bind(child))
+        // child.addEventListener('input',listener.bind(child))
+        Connected.bindField(child, model)
       }
       child = child.nextSibling
     }
