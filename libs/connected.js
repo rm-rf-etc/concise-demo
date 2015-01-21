@@ -34,9 +34,9 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
 ;(function(){
 
-  // var familyOf = require('./lib-tmp/typeof.js').familyOf
-  // var typeOf = require('./lib-tmp/typeof.js').typeOf
-  // var MicroEvent = require('microevent')
+  var familyOf = require('./typeof.js').familyOf
+  var typeOf = require('./typeof.js').typeOf
+  var MicroEvent = require('microevent')
 
 
 
@@ -67,7 +67,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
       return new BindableObject(data)
   }
 
-  function BindableObject(data){ console.log(data)
+  function BindableObject(data){
     Object.keys(data).map(function(prop){
       this._new_property_ = [prop, data[prop]]
     }.bind(this))
@@ -393,42 +393,6 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
   DEFINE(NewBindable, 'bindables', {get:function(){return _bindables}, enumerable:true})
   DEFINE(NewBindable, 'PROPERTY_MANIPULATOR', {value:PROPERTY_MANIPULATOR, writeable:false})
-
-  function familyOf(thing){
-    var type = typeOf(thing)
-    if (type) {
-      return ({
-        Date: 'simple'
-      , String: 'simple'
-      , Number: 'simple'
-      , Boolean: 'simple'
-      , Function: 'simple'
-      , RegExp: 'simple'
-      , Array: 'complex'
-      , Object: 'complex'
-      , HTMLElement: 'complex'
-      , 'undefined': 'falsey'
-      , 'null': 'falsey'
-      , 'NaN': 'falsey'
-      })[type] || 'complex'
-    } else {
-      return false
-    }
-  }
-
-  function typeOf(thing){
-    if (typeof thing === 'number') return isNaN(thing) ? 'NaN' : 'Number'
-    else if (thing instanceof HTMLElement) return 'HTMLElement'
-    else return (thing !== null && thing !== undefined && thing.constructor) ? getObjectClass(thing) : '' + thing
-  }
-
-  function getObjectClass(obj) {
-    var string
-    if (obj.constructor && obj.constructor.toString) string = obj.constructor.toString()
-    else throw new Error('Object constructor does not have toString method.')
-
-    return (/function\s+(\w+)/.test(string)) ? string.match(/function\s+(\w+)/)[1] : 'Anonymous Class'
-  }
 
 
   if (typeof module !== 'undefined' && module.hasOwnProperty('exports')) {

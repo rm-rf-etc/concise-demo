@@ -16,6 +16,8 @@
     "setTimeout": false,
     "require": false,
     "HTMLElement": false,
-    "ActiveXObject": false
+    "ActiveXObject": false,
+    "Buffer": false,
+    "__dirname": false
   }
 }
