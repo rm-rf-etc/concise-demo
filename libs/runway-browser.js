@@ -8,7 +8,7 @@ window.onpopstate = function(event){
 
 function processLink(){
   if (/^\//.test(this.href) || this.href.indexOf(location.host) > -1) {
-    router.listener({ url:this.url }, null)
+    router.listener({ url:/http[s]?:\/\/[^\/]+\/(.*)$/.exec(this.href)[1] }, null)
     return false
   }
   return true
