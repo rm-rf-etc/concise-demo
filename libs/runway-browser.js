@@ -7,11 +7,10 @@ window.onpopstate = function(event){
 
 
 function processLink(){
-  if (/^\//.test(this.href) || this.href.indexOf(location.host) > -1) {
-    router.listener({ url:/http[s]?:\/\/[^\/]+\/(.*)$/.exec(this.href)[1] }, null)
-    return false
-  }
-  return true
+  var url = this.href
+  url = (this.href[0] === '/') ? this.href.slice(1) : /(http:|https:)?\/\/[^\/]+\/(.*)$/.exec(this.href)[2]
+  router.listener({ url:url }, null)
+  return false
 }
 function init(){
   for (var i = 0, length = document.links.length; i < length; document.links[i++].onclick = processLink);
