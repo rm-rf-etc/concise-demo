@@ -18,6 +18,10 @@
     "HTMLElement": false,
     "ActiveXObject": false,
     "Buffer": false,
-    "__dirname": false
+    "__dirname": false,
+    "addEventListener": false,
+    "attachEvent": false,
+    "onload": false,
+    "location": false
   }
 }
