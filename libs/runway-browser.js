@@ -31,25 +31,15 @@ function doRoute(href){
 }
 
 function goForward(url){
-  var title = Math.random().toString().split('.')[1]
-  if (history.pushState) history.pushState({url:url, title:title}, null, url)
+  if (history.pushState) history.pushState({url:url}, null, url)
   else location.assign(url)
 }
 
-window.addEventListener('popstate',function(event){
-  doRoute(event.state.url)
-})
-
-window.onpopstate = function(event){
-  // doRoute(event.state.url)
-  // console.log( event )
-  // window.alert('location: ' + document.location + ', state: ' + JSON.stringify(event.state))
-}
+window.onpopstate = function(event){ doRoute(event.state.url) }
 
 function init(){
-  history.replaceState( {url:location.pathname}, null, location.pathname )
-  var ctrl = runway.finder(location.pathname)
-  if (ctrl) ctrl()
+  // history.replaceState( {url:location.pathname}, null, location.pathname )
+  doRoute(location.pathname)
 }
-// setTimeout(init,100)
+
 window.addEventListener ? addEventListener('load', init, false) : window.attachEvent ? attachEvent('onload', init) : (onload = init)
