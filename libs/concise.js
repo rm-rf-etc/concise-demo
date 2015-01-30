@@ -34,14 +34,15 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 ;(function(){
 
   var Connected = require('./connected.js').Connected
-  var familyOf = require('./connected.js').familyOf
-  var typeOf = require('./connected.js').typeOf
-  var router = require('./runway-browser.js')
+  var familyOf = require('./typeof.js').familyOf
+  var typeOf = require('./typeof.js').typeOf
 
 
   var concise = new Concise()
   var DEFINE = Object.defineProperty
   var _current_modifiers_
+
+  concise.routes = require('./runway-browser.js').routes
 
 
   /*

@@ -1,18 +1,43 @@
 
-var router = require('./runway.js')
+var runway = require('./runway.js')
+module.exports = runway
+
+
+
+document.onclick = function(event) {
+  event = event || window.event // IE specials
+  var target = event.target || event.srcElement // IE specials
+
+  if (target.tagName === 'A') {
+    event.preventDefault()
+    processLink.call(target)
+  }
+}
+
+function processLink(){
+  var href = this.href.replace(location.origin,'')
+  // console.log('processLink', this.href, href)
+  if (this.dataset.ajax !== 'none') {
+    var ctrl = runway.finder(href)
+    if (ctrl) {
+      ctrl()
+      updateUrl(href)
+    }
+    return false
+  }
+  return true
+}
+
+function updateUrl(url){
+  if (history.pushState) history.pushState(null, '', url)
+  else location.assign(url)
+}
 
 window.onpopstate = function(event){
   window.alert('location: ' + document.location + ', state: ' + JSON.stringify(event.state))
 }
 
-
-function processLink(){
-  var url = this.href
-  url = (this.href[0] === '/') ? this.href.slice(1) : /(http:|https:)?\/\/[^\/]+\/(.*)$/.exec(this.href)[2]
-  router.listener({ url:url }, null)
-  return false
-}
-function init(){
-  for (var i = 0, length = document.links.length; i < length; document.links[i++].onclick = processLink);
-}
-window.addEventListener ? addEventListener('load', init, false) : window.attachEvent ? attachEvent('onload', init) : (onload = init)
+// function init(){
+//   for (var i = 0, length = document.links.length; i < length; document.links[i++].onclick = processLink);
+// }
+// window.addEventListener ? addEventListener('load', init, false) : window.attachEvent ? attachEvent('onload', init) : (onload = init)

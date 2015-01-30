@@ -1,207 +1,157 @@
 
 /*!
  * Runway Router
- * Copyright(c) 2014 Rob Christian
+ * Copyright(c) 2015 Rob Christian
  * MIT Licensed
  */
 
-var _ = require('lodash')
-
-// var typeOf = require('./typeof.js').typeOf
+var typeOf = require('./typeof.js').typeOf
 
 var routes_tree = Object.create(null)
 var logger
-var wildcards = [
-  { card: '{int}', pattern: '([1-9][0-9]*)'     },
-  { card: '{any}', pattern: '([0-9a-zA-Z-_.]+)' },
-  { card: '{a-z}', pattern: '([a-zA-Z]+)'       },
-  { card: '{num}', pattern: '([0-9]+)'          }
-]
-
-
-
-/**
- * The router API.
- */
-function router(){
-
-  add.config = config
-
-  // c is for controller, f is for filters.
-  function add(url, f, c){
-    var $, nested
-
-    if (typeof url !== 'string')
-      throw new Error('Router accepts only a string as the first argument.')
-
-    c = arguments[arguments.length-1]
-    f = (Array.isArray(f)) ? f : []
-
-    if (typeOf(c) !== 'Function') throw new Error('Controller either not specified or invalid.')
-    f.forEach(f,function(e){
-      if (typeOf(e) !== 'Function') throw new Error('Filter is not a function: '+{}.toString.apply(e))
-    })
-
-    $ = [].concat(f).concat(c)
-
-    if (logger && typeOf(logger) === 'Function')
-      logger('add route:', url, 'filters and controller:', $)
-    // Convert route string into array of path segments.
-    url = url.replace(/(^\/|\/$)/g,'').split('/')
-    url[url.length] = '$'
-    nested = newBranch(url, $)
-
-    // Now include the new route in our routes map object.
-    _.merge(routes_tree, nested, function(a,b){
-      var arr = a || b
-      if (Array.isArray(a))
-        return _.uniq(a.concat(b), function(x){if (x) return x.toString()})
-      else if (Array.isArray(b))
-        return b
-    }) // Arrays are used for storing any segments which contain regex.
-
-    return add
-  }
-
-  return add.apply(null, arguments)
+var wildcards = {
+  '{int}': '([1-9][0-9]*)',
+  '{any}': '(.*)',
+  '{a-z}': '([a-zA-Z]+)',
+  '{num}': '([0-9]+)'
 }
-router.config = config
+
+module.exports = {
+  routes: router
+, finder: pathMatcher
+}
 
 
 
 /**
- * Configuration API.
+ * Calling this function adds a new route.
  */
-function config(name, obj){
+function router(url, f, c){ // c is for controller, f is for filters.
+  var $, nested
 
-  if (typeOf(name) === 'String') {
+  if (typeof url !== 'string')
+    throw new Error('Router accepts only a string as the first argument.')
 
-    switch (name) {
+  c = arguments[arguments.length-1]
+  f = (Array.isArray(f)) ? f : []
 
-    case 'error':
-      // Override default 404 response function.
-      if (typeOf(obj) === 'Function') sendError = obj
-      break
+  if (typeOf(c) !== 'Function') throw new Error('Controller either not specified or invalid.')
+  f.forEach(function(e){
+    if (typeOf(e) !== 'Function') throw new Error('Filter is not a function: '+{}.toString.apply(e))
+  })
 
-    case 'logger':
-    case 'logging':
-      // Provide a callback to use for logging. Change to null/false/undefined to disable.
-      if (typeOf(obj) === 'Function') logger = obj
-      break
+  $ = [].concat(f).concat(c)
 
-    case 'wildcard':
-    case 'wildcards':
-      // Add new wild card expressions.
-      if (Array.isArray(obj)) {
-        wildcards = _(wildcards).concat(obj).where(function(obj){
-          return obj.card && obj.pattern && typeOf(obj.card) === 'String' && typeOf(obj.pattern) === 'String'
-        }).value()
-      }
-      break
-    }
-  }
+  if (logger && typeOf(logger) === 'Function')
+    logger('add route:', url, 'filters and controller:', $)
+  // Convert route string into array of path segments.
+  url = url.replace(/(^\/|\/$)/g,'').split('/')
+  url[url.length] = '$'
+  nested = newBranch(url, $)
+
+  // Now include the new route in our routes map object.
+  treeMerge(routes_tree, nested)
 
   return router
 }
 
 
 
-// Default failure handler (when no matching route is found). Use config() to override.
-function sendError(code, req, res, args, ops){
-  res.end(code)
-}
-
 /**
- * This is the node HTTP request listener. It will try to match the requested URL
- * and invoke the associated controller, or otherwise invoke error(), which calls
- * req.end('404') as the default. But you can override the error handler using
- * config().
+ * Test a given URL. If it matches, return the leaf node from the routes_tree.
  */
-router.listener = function(req, res){
+function pathMatcher(url){
+  // console.log('pathMatcher', url, routes_tree)
+  if (! routes_tree) throw new Error('No routes defined.')
 
-  var $, ops, route, args, norm, regs, redirect, i, n
-  args = []
-  n = 0
-
-  ops = {
-    i_redirect: function(fn){ // replace the controller with a different one.
-      $[$.length-1] = fn
-    },
-    error: function(code){
-      sendError(code,req,res)
-    }
-  }
+  var args = [], n = 0
 
   // Convert route into array of URL segments, ending with "$", the leaf node.
-  route = req.url.slice(1).replace(/\/$/g,'').split('?')[0].split('/')
+  var route = url.slice(1).replace(/\/$/g,'').split('?')[0].split('/')
   route[route.length] = '$'
 
-  // Climb the routes map, always check first for a matching static route segment before trying regex.
-  $ =  route.reduce(function(obj, seg){
-    if (!obj)
-      return
+  var ctrl = route.reduce(treeClimber, routes_tree)[0] // <- leaf node from matching route, or undefined.
+  return ctrl ? function(){ ctrl.apply(null, args) } : null
 
-    norm = obj[seg] || undefined
-    if (norm)
-      return norm
 
-    regs = obj['{regex}'] || undefined
+  // We define this internally so that args and n are within scope.
+  // Climb the routes tree. Always check first for a matching static route segment before trying regex.
+  function treeClimber(obj, seg){
+    // console.log('treeClimber', obj, seg)
+
+    if (obj[seg]) return obj[seg]
+
+    var regs = obj['<regex>'] || undefined
     if (regs) {
-      for (i=0; i < regs.length; i++) {
-        if (regs[i].test(seg)) {
-          args[n++] = regs[i].exec(seg)[1] // Increments n after the value is used for the assignment. More performant than .push().
-          return obj[regs[i].toString()]
+      for (var i=0; i < regs.patterns.length; i++) {
+        if (regs.patterns[i].test(seg)) {
+          args[n++] = seg // Increments n after the value is used for the assignment. More performant than .push().
+          return regs[regs.patterns[i].toString()]
         }
       }
     }
-  }, routes_tree) // <-- This is the object to climb.
-
-  i = -1
-  if ($) {
-    // Execute in order, each function stored in the leaf node. (note: $[i++] != $[++i])
-    (function next(){
-      i++
-      if ($[i])
-        return $[i](req, res, args, ops, next)
-      else
-        return sendError('404', req, res, args, ops)
-    })()
   }
-  else sendError('404', req, res, args, ops)
 }
+
 
 
 
 /**
  * Helpers
  */
-// Swap keys for values in a given string and return it as a regular expression.
-function toRegExp(string){
-  Object.keys(wildcards).forEach(function(e){
-    e = wildcards[e]
-    string = string.replace(e.card, e.pattern)
-  })
-
-  return new RegExp(string)
-}
-// A branch is a series of nested objects.
+// This converts an array representation of a complete route path, into a series of nested objects.
 function newBranch(array, fn){
-  return array.reverse().reduce(function(cumulate, segment){
-    var x = Object.create(null)
-    if (/\{...\}/g.test(segment)) {
-      var re = toRegExp(segment)
-      x['{regex}'] = [re]
-      x[re.toString()] = cumulate
-      return x
-    } else {
-      x[segment] = cumulate
-      return x
-    }
-  }, fn)
+  return array.reverse().reduce(branchBuildingLogic, fn)
 }
 
+function branchBuildingLogic(cumulate, segment){
+  var x = Object.create(null)
 
+  if (! /^\{.+\}$/g.test(segment)) {
+    x[segment] = cumulate
+    return x
+  }
+  else {
+    if (! wildcards(segment)) throw new Error('Unknown wildcard used in route: '+segment)
 
-/**
- */
-module.exports = router
+    var re = new RegExp(wildcards[segment])
+    x['<regex>'] = { patterns: [re] }
+    x['<regex>'][re.toString()] = cumulate
+    return x
+  }
+}
+
+// This merges a branch object (nested objects representing a route path) into our route tree object.
+function treeMerge(to,from,fn){ console.log(to,from,fn)
+  Object.keys(from).map(function(prop){ console.log('property:',prop)
+
+    switch (true) {
+
+      case prop === '<regex>':
+        if (Object.hasOwnProperty.call(to,prop)) {
+          from[prop].patterns.map(function(regex){
+            if (hasMatchingRegex(to[prop].patterns, regex)) to[prop].patterns.push(regex)
+          })
+        }
+        else to[prop] = from[prop]
+        break
+
+      case Object.hasOwnProperty.call(to,prop):
+        treeMerge(to[prop],from[prop])
+        break
+
+      default:
+        to[prop] = from[prop]
+
+    }
+    return
+  })
+}
+
+function hasMatchingRegex(array,regex){
+  return array.reduce(function(last,next){ return last || regexCompare(next,regex) }, false)
+}
+
+function regexCompare(a,b){
+  return a.toString() === b.toString()
+}

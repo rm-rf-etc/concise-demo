@@ -5,8 +5,6 @@
   "globals": {
     "Connected": false,
     "concise": false,
-    "familyOf": false,
-    "typeOf": false,
     "MicroEvent": false,
     "console": false,
     "module": false,
@@ -22,6 +20,7 @@
     "addEventListener": false,
     "attachEvent": false,
     "onload": false,
-    "location": false
+    "location": false,
+    "history": false
   }
 }

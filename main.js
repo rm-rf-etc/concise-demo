@@ -7,11 +7,28 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
 */
 
-window.Connected = require('./libs/connected.js').Connected
+// window.Connected = require('./libs/connected.js').Connected
 
 ;(function(){
 
   var concise = require('./libs/concise.js')
+
+
+  var AccountCtrl = new concise.Controller('account', function(o){
+    o.dom = {
+    "row.width-12.column":{
+      "section.width-6.centered":{
+        "div 1":{
+          "p":{
+            "a href='/' innerHTML='Sign-in or login here.'":0
+          }
+        },
+        "div 2":{
+          "p innerHTML='Account Settings'":0
+        }
+      }
+    }}
+  })
 
 
   var HomeCtrl = new concise.Controller('home', function(o){
@@ -29,6 +46,7 @@ window.Connected = require('./libs/connected.js').Connected
         var pass_conf_o
 
         o.dom = {
+        "a href='/account' innerHTML='Account Settings'":0,
         "form 1 validate":function(o){
           signup_form_el = this
 
@@ -105,11 +123,13 @@ window.Connected = require('./libs/connected.js').Connected
 
   })
 
-  // This is just junk right now. Routing will be implemented soon.
+  // console.log( concise.routes )
   concise.routes
   ('/', HomeCtrl)
+  ('/account', AccountCtrl)
 
   window.HomeCtrl = HomeCtrl
+  window.AccountCtrl = AccountCtrl
   HomeCtrl()
 
 })();
