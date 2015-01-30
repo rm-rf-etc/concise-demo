@@ -18,14 +18,18 @@ function processLink(){
   var href = this.href.replace(location.origin,'')
   // console.log('processLink', this.href, href)
   if (this.dataset.ajax !== 'none') {
-    var ctrl = runway.finder(href)
-    if (ctrl) {
-      ctrl()
-      updateUrl(href)
-    }
+    goto(href)
     return false
   }
   return true
+}
+
+function goto(href){
+  var ctrl = runway.finder(href)
+  if (ctrl) {
+    ctrl()
+    updateUrl(href)
+  }
 }
 
 function updateUrl(url){
@@ -37,7 +41,6 @@ window.onpopstate = function(event){
   window.alert('location: ' + document.location + ', state: ' + JSON.stringify(event.state))
 }
 
-// function init(){
-//   for (var i = 0, length = document.links.length; i < length; document.links[i++].onclick = processLink);
-// }
-// window.addEventListener ? addEventListener('load', init, false) : window.attachEvent ? attachEvent('onload', init) : (onload = init)
+function init(){ goto(location.pathname) }
+// setTimeout(init,100)
+window.addEventListener ? addEventListener('load', init, false) : window.attachEvent ? attachEvent('onload', init) : (onload = init)

@@ -2,6 +2,7 @@
   "asi": true,
   "undef": true,
   "laxcomma": true,
+  "laxbreak": true,
   "globals": {
     "Connected": false,
     "concise": false,

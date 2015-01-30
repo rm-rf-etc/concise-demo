@@ -7,7 +7,6 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
 */
 
-// window.Connected = require('./libs/connected.js').Connected
 
 ;(function(){
 
@@ -17,12 +16,8 @@ http://inimino.org/~inimino/blog/javascript_semicolons
   var AccountCtrl = new concise.Controller('account', function(o){
     o.dom = {
     "row.width-12.column":{
+      "a href='/' innerHTML='Login or register here.'":0,
       "section.width-6.centered":{
-        "div 1":{
-          "p":{
-            "a href='/' innerHTML='Sign-in or login here.'":0
-          }
-        },
         "div 2":{
           "p innerHTML='Account Settings'":0
         }
@@ -39,6 +34,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
     o.dom = {
     "row.width-12.column":{
+      "a href='/account' innerHTML='Account Settings'":0,
       "section.width-6.centered":function(o){
         var signup_form_el
         var signin_form_el
@@ -46,7 +42,6 @@ http://inimino.org/~inimino/blog/javascript_semicolons
         var pass_conf_o
 
         o.dom = {
-        "a href='/account' innerHTML='Account Settings'":0,
         "form 1 validate":function(o){
           signup_form_el = this
 
@@ -123,13 +118,10 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
   })
 
-  // console.log( concise.routes )
+
   concise.routes
   ('/', HomeCtrl)
   ('/account', AccountCtrl)
 
-  window.HomeCtrl = HomeCtrl
-  window.AccountCtrl = AccountCtrl
-  HomeCtrl()
 
 })();
