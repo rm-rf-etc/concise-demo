@@ -7,7 +7,7 @@ module.exports = function($){
   var pass_conf_$
 
   $.onActive(function(){
-    if (signin_form_el.style.display === 'block') {
+    if (signup_form_el.style.display === 'none') {
       signin_form_el.style.display = 'none'
       signup_form_el.style.display = 'block'
     }

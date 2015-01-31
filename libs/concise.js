@@ -131,6 +131,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
       builder = new DomBuilder(this, el)
 
+console.log( 'parsed.helpers', parsed.helpers )
       if (parsed.helpers && parsed.helpers.length) {
         parsed.helpers.map(function(helper_str){
           //
@@ -210,57 +211,27 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
   /* Takes a CSS selector-style string and generates corresponding real DOM element. */
 
   function parseElementString(desc){
-    var el=null, tag='', id='', classes=[], regex=null, matches=true, properties=[], tokens, validate=false, helpers
+    var el=null, parts, tag_id_classes, props_helpers, tag='', id='', classes=[], regex=null, matches=true, properties=[], tokens, validate=false, helpers=[]
     var keywords = ['validate']
 
-    if (/#/g.test(desc) && /#/g.test(desc).length > 1)
-      throw new Error("HTML descriptor cannot contain multiple id's: "+desc)
+    if (/^[^\w]/g.test(desc)) throw new Error("Descriptor doesn't begin with a tag name: "+desc)
 
-    if (! /^\w/g.test(desc))
-      throw new Error("Descriptor doesn't begin with a tag name: "+desc)
-
-    tokens = desc.match(/(?:[^\s"']+|['"][^"']*['"])+/g).slice(1)
-
-    validate = tokens.indexOf('validate') !== -1
+    // Split at the very first space character.
+    parts = /^([^\s]+)(?:\s(.*))?$/g.exec(desc)
+    tag_id_classes = parts[1]
+    if (tag_id_classes && /#/g.test(tag_id_classes) && tag_id_classes.match(/#/g).length > 1) throw new Error('HTML descriptor cannot contain multiple ids: '+tag_id_classes)
 
 
-    if (/^[\w-]+(#[\w-]+)?(\.[\w-]+)*/.test(desc)) {
-
-      tag = /^[\w-]+/.exec(desc)[0]
-
-      id = /#[^.]+/g.test(desc) ? (/#([^.]+)/g).exec(desc)[1] : null
-
-      classes = desc.split(' ')[0].split('.').slice(1)
-    }
-    else throw new Error('No tagName found in HTML descriptor: '+desc)
-
-
-    tokens.map(function(string, id){ //console.log(id, string)
-      // console.log( 'TOKEN', string )
-      switch (true) {
-
-        case (/^\d+$/.test(string)): //console.log('case',1)
-          break;
-
-        case (/^(\w[\w.]*)=["']([^'"]*)["']$/.test(string)): //console.log('case',2)
-          var property_path
-          matches = /^([\w.]+)=["']([^'"]*)["']$/.exec(string)
-          property_path = matches[1].split('.')
-          property_path.push( matches[2] )
-          properties.push( property_path )
-          break;
-
-        case (/^[\w-]+$/.test(string)): //console.log('case',3)
-          matches = /^[\w-]+$/.exec(string)
-          if (keywords.indexOf(matches[0]) === -1) properties.push( [matches[0], true] )
-          break;
-
-        case (/^\w+\([^)]+\)$/.test(string)): //console.log('case',4)
-          if (! helpers) helpers = []
-          helpers.push(string)
-          break;
-
-        default: throw new Error('Invalid token in HTML descriptor: '+string)
+    tag_id_classes = tag_id_classes.match(/[#.]?\w[\w\d-]*/g)
+    tag = tag_id_classes[0]
+    tag_id_classes.map(function(string){
+      switch (string[0]) {
+        case ('#'):
+          id = string.slice(1)
+          break
+        case ('.'):
+          classes[classes.length] = string.slice(1)
+          break
       }
     })
 
@@ -271,19 +242,72 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
     if (id)
       el.id = id
 
-    // A property path is an array where each subsequent item is the value of the previous property on the parent.
-    // This allows us to set nested properties defined as a string, like "style.display='block'".
-    properties.forEach(function(prop_path){
 
-      prop_path.reduce(function(parent, child){ //if (logit) console.log(parent, child)
-        if (prop_path.indexOf(child) === prop_path.length-2) {
-          parent[child] = prop_path.pop()
-        } else {
-          return parent[child]
+    // Now for the hard stuff. Handling property values and helper referrences.
+    /** Here's the expression broken down into its constituent parts:
+       (\w+(?:\.\w+)*=['].*?['])(?=\s[\w\d.]+(?:[=(]|$))
+     | (\w+(?:\.\w+)*=["].*?["])(?=\s[\w\d.]+(?:[=(]|$))
+     | (\w+(?:\.\w+)*=['].*?['])$
+     | (\w+(?:\.\w+)*=["].*?["])$
+     | (\w+[(]\w(?:[\w\d]+|[\w\d.][^.])*[)])$
+     | ([\w\d-]+)/g
+     */
+    if (parts[2]) {
+      props_helpers = parts[2]
+
+// console.log( 'BEFORE', props_helpers ) // KEEP THIS FOR FUTURE DEBUGGING
+
+      var match_props_and_helpers = /(\w+(?:\.\w+)*=['].*?['])(?=\s[\w\d.]+(?:[=(]|$))|(\w+(?:\.\w+)*=["].*?["])(?=\s[\w\d.]+(?:[=(]|$))|(\w+(?:\.\w+)*=['].*?['])$|(\w+(?:\.\w+)*=["].*?["])$|(\w+[(]\w(?:[\w\d]+|[\w\d.][^.])*[)])$|([\w\d-]+)/g
+      tokens = props_helpers.match(match_props_and_helpers)
+      if (/\w+\(.*\)$/g.test(props_helpers) && /\w+\((?:[^\w].*|.*[^\w])\)$/g.test(props_helpers))
+        throw new Error('Invalid helper definition: '+props_helpers)
+
+// console.log( 'AFTER', tokens ) // KEEP THIS FOR FUTURE DEBUGGING
+
+      validate = tokens.indexOf('validate') !== -1
+
+      tokens.map(function(string, id){
+        // console.log( 'TOKEN', string )
+        switch (true) {
+
+          case (/^[\w\d][\w\d-]*$/.test(string)):
+            matches = /^[\w\d][\w\d-]*$/.exec(string)
+            if (keywords.indexOf(matches[0]) === -1) properties[properties.length] = [matches[0], true]
+            break
+
+          case (/^(\w[\w\d.]*)=["'](.*)["']$/.test(string)):
+            var property_path
+            matches = /^([\w.]+)=["']((?:\"|\'|[^'"])*)["']$/.exec(string)
+            property_path = matches[1].split('.')
+            property_path[property_path.length] = matches[2]
+            properties[properties.length] = property_path
+            // console.log('PROP PATH', property_path)
+            break
+
+          case (/^\w[\w\d]+\([^)]+\)$/.test(string)):
+            if (! helpers) helpers = []
+            helpers[helpers.length] = string
+            break
+
+          default: throw new Error('Invalid token in HTML descriptor: '+string)
         }
-      }, el)
+      })
 
-    })
+
+      // A property path is an array where each subsequent item is the value of the previous property on the parent.
+      // This allows us to set nested properties defined as a string, like "style.display='block'".
+      properties.forEach(function(prop_path){
+
+        prop_path.reduce(function(parent, child){ //if (logit) console.log(parent, child)
+          if (prop_path.indexOf(child) === prop_path.length-2) {
+            parent[child] = prop_path.pop()
+          } else {
+            return parent[child]
+          }
+        }, el)
+
+      })
+    }
 
     return { el:el, validate:validate, helpers:helpers }
   }
