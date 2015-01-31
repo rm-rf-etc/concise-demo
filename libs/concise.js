@@ -42,6 +42,8 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
   var concise = new Concise()
   var DEFINE = Object.defineProperty
   var _current_modifiers_
+  var MicroEvent = require('microevent')
+  var _controller_events = new MicroEvent()
 
   concise.routes = require('./runway-browser.js').routes
 
@@ -67,24 +69,28 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
     this.view_body.appendChild(view)
   }
 
-  Concise.prototype.routes = function(path, controller){
-    // body...
-  }
-
   Concise.prototype.helpers = Helpers()
 
   Concise.prototype.Controller = function(name, constructor){
 
-    var view = document.createElement('div')
-    view.id = name || Math.random().toString().split('.')[1]
+    this._id = name || Math.random().toString().split('.')[1]
+
+    var view = document.createElement('container')
+    view.id = name || this._id
 
     var builder = new DomBuilder(null, view)
+    builder.onActive = this.onActive
 
-    constructor.call(this,builder)
+    constructor.call(this, builder)
 
     return function(){
-      concise.setView( view )
+      _controller_events.trigger(this._id)
+      concise.setView(view)
     }
+  }
+
+  Concise.prototype.Controller.prototype.onActive = function(fn){
+    _controller_events.bind(this._id, fn)
   }
 
 
@@ -95,66 +101,67 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
     this.validates = false
   }
 
-  DEFINE(DomBuilder.prototype, 'dom', {enumerable:false, configurable:false,
-    set:function(structure){
-      //console.log(typeOf(structure), structure)
-      if (! familyOf(this.el)) throw new Error('Missing valid view element. Cannot build a DOM before doing `o.view = document.querySelector(<your_selector>)`.')
-      if (typeOf(structure) !== 'Object') throw new Error('Invalid dom structure object.')
-
-      var helper_fn, helper_str, builder, value, data, parsed, el
-
-
-      Object.keys(structure).map(function(key){
-        value = structure[key]
-
-
-        if (elDefinitionValidate(key)) {
-          parsed = parseElementString(key)
-          if (parsed.validate) this.validates = true
-          el = parsed.el
-          // console.log( 'USES VALIDATION', parsed.validate )
-        }
-        else return
-
-        if (! value) {
-          this.el.appendChild(el)
-          return
-        }
-
-        builder = new DomBuilder(this, el)
-
-        if (parsed.helpers && parsed.helpers.length) {
-          parsed.helpers.map(function(helper_str){
-            //
-            if (typeOf(value) !== 'Function') throw new Error('DOM object "'+key+'" defined with helper method but has no function upon which to apply it.')
-
-            helper_fn = concise.helpers[ helper_str.split('(')[0] ]
-
-            data = /\((.+)\)/g.exec(helper_str)[1]
-            data = data.split('.').reduce(function(object, prop){
-              return object[prop]
-            }, connected.models)
-            helper_fn(builder,data,value)
-            this.el.appendChild(el)
-            // this.maintainer.include(key, el)
-          }.bind(this))
-        }
-        else if (typeOf(value) === 'Object') {
-          builder.dom = value
-          this.el.appendChild(el)
-          // this.maintainer.include(key, el)
-        }
-        else if (typeOf(value) === 'Function') {
-          value.call(el,builder)
-          this.el.appendChild(el)
-          // this.maintainer.include(key, el)
-        }
-
-      }.bind(this))
-
-      if (this.parent.validates && this.el.tagName === 'FORM') this.formValidate()
-    }
+  DEFINE(DomBuilder.prototype, 'dom', {enumerable:false, configurable:false
+  , set:domBuilderMethod
   })
+  function domBuilderMethod(structure){
+    //console.log(typeOf(structure), structure)
+    if (! familyOf(this.el)) throw new Error('Missing valid view element. Cannot build a DOM before doing `o.view = document.querySelector(<your_selector>)`.')
+    if (typeOf(structure) !== 'Object') throw new Error('Invalid dom structure object.')
+
+    var helper_fn, helper_str, builder, value, data, parsed, el
+
+
+    Object.keys(structure).map(function(key){
+      value = structure[key]
+
+
+      if (elDefinitionValidate(key)) {
+        parsed = parseElementString(key)
+        if (parsed.validate) this.validates = true
+        el = parsed.el
+        // console.log( 'USES VALIDATION', parsed.validate )
+      }
+      else return
+
+      if (! value) {
+        this.el.appendChild(el)
+        return
+      }
+
+      builder = new DomBuilder(this, el)
+
+      if (parsed.helpers && parsed.helpers.length) {
+        parsed.helpers.map(function(helper_str){
+          //
+          if (typeOf(value) !== 'Function') throw new Error('DOM object "'+key+'" defined with helper method but has no function upon which to apply it.')
+
+          helper_fn = concise.helpers[ helper_str.split('(')[0] ]
+
+          data = /\((.+)\)/g.exec(helper_str)[1]
+          data = data.split('.').reduce(function(object, prop){
+            return object[prop]
+          }, connected.models)
+          helper_fn(builder,data,value)
+          this.el.appendChild(el)
+          // this.maintainer.include(key, el)
+        }.bind(this))
+      }
+      else if (typeOf(value) === 'Object') {
+        builder.dom = value
+        this.el.appendChild(el)
+        // this.maintainer.include(key, el)
+      }
+      else if (typeOf(value) === 'Function') {
+        value.call(el,builder)
+        this.el.appendChild(el)
+        // this.maintainer.include(key, el)
+      }
+
+    }.bind(this))
+
+    if (this.parent.validates && this.el.tagName === 'FORM') this.formValidate()
+  }
 
   DEFINE(DomBuilder.prototype, 'model', {enumerable:false, configurable:false, set:function(){},
     get:function(){ return this._model || this.parent.model }

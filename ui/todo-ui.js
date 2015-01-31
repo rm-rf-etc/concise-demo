@@ -3,7 +3,7 @@ module.exports = function(list){
 
   return {
     'div.width-12.columns.centered':{
-      'a href="/" innerHTML="Login or Sign-in"':0,
+      'a href="/" innerHTML="Sign-up"':0,
       'div.width-6.columns.centered':{
         'div.list-editor':{
           'form':function($){

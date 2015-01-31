@@ -1,5 +1,17 @@
 
-module.exports = function(){
+module.exports = function($){
+
+  var signup_form_el
+  var signin_form_el
+  var name_conf_$
+  var pass_conf_$
+
+  $.onActive(function(){
+    if (signin_form_el.style.display === 'block') {
+      signin_form_el.style.display = 'none'
+      signup_form_el.style.display = 'block'
+    }
+  })
 
   function getComparator(model, prop1, prop2){
     return function(){ return model[prop1] === model[prop2] }
@@ -8,13 +20,7 @@ module.exports = function(){
   return {
   "row.width-12.column":{
     'a href="/todos" innerHTML="To-Dos"':0,
-    "section.width-6.centered":function($){
-      var signup_form_el
-      var signin_form_el
-      var name_conf_$
-      var pass_conf_$
-
-      $.dom = {
+    "section.width-6.centered":{
       "form 1 validate":function($){
         signup_form_el = this
 
@@ -83,7 +89,7 @@ module.exports = function(){
           console.log( 'Sign-in form is valid? '+$.el.checkValidity() )
         })
 
-      }}
+      }
 
     }
 

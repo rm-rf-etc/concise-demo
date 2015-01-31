@@ -15,7 +15,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
   var Bindable = connected.Bindable
   var uis = {
     todo: require('./ui/todo-ui.js')
-  , authForm: require('./ui/auth-form-ui.js')
+  , auth_me: require('./ui/auth-form-ui.js')
   }
 
   var ctrls = controllers() // I wanted routes defined above controller functions, so I put them in a named function.
@@ -50,7 +50,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
       }),
 
       HomeCtrl: new concise.Controller('home', function($){
-        $.dom = uis.authForm()
+        $.dom = uis.auth_me($)
       })
 
     }
