@@ -18,31 +18,43 @@ http://inimino.org/~inimino/blog/javascript_semicolons
   , authForm: require('./ui/auth-form-ui.js')
   }
 
+  var ctrls = controllers() // I wanted routes defined above controller functions, so I put them in a named function.
 
-  var TodoCtrl = new concise.Controller('todo', function($){
+  concise.routes
+  ('/', ctrls.HomeCtrl)
+  ('/todos', ctrls.TodoCtrl)
 
-    var list = new Bindable([
-      {checked:false, text:'buy almond milk'}
-    , {checked:false, text:'schedule dentist appointment'}
-    , {checked:false, text:'breakup with Katey'}
-    ])
-    connected.name('list',list)
+  // This is another style you can use to define routes.
+  // concise.routes([
+  //   ['/', HomeCtrl()]
+  // , ['/todos', TodoCtrl()]
+  // ])
 
-    $.dom = uis.todo(list)
-
-  })
-
-
-
-  var HomeCtrl = new concise.Controller('home', function($){
-    $.dom = uis.authForm()
-  })
+  // v For use in debugging.
+  window.concise = concise
+  window.connected = connected
 
 
-  concise.routes([
-    ['/', HomeCtrl]
-  , ['/todos', TodoCtrl]
-  ])
+  function controllers(){
+
+    return {
+
+      TodoCtrl: new concise.Controller('todo', function($){
+        var list = new Bindable([
+          {checked:false, text:'buy almond milk'}
+        , {checked:false, text:'schedule dentist appointment'}
+        , {checked:false, text:'breakup with Katey'}
+        ])
+        connected.name('list',list)
+        $.dom = uis.todo(list)
+      }),
+
+      HomeCtrl: new concise.Controller('home', function($){
+        $.dom = uis.authForm()
+      })
+
+    }
+  }
 
 
 })();

@@ -85,20 +85,21 @@ function pathMatcher(url){
   // We define this internally so that args and n are within scope.
   // Climb the routes tree. Always check first for a matching static route segment before trying regex.
   function treeClimber(obj, seg){
-    // console.log('treeClimber', obj, seg)
+    if (! obj) return null
 
-    if (obj[seg]) return obj[seg]
-
-    var regs = obj['<regex>'] || undefined
-    if (regs) {
-      for (var i=0; i < regs.patterns.length; i++) {
-        if (regs.patterns[i].test(seg)) {
-          args[n++] = seg // Increments n after the value is used for the assignment. More performant than .push().
-          return regs[regs.patterns[i].toString()]
+    return obj[seg] || (function(){
+      var regs = obj['<regex>'] || undefined
+      if (regs) {
+        for (var i=0; i < regs.patterns.length; i++) {
+          if (regs.patterns[i].test(seg)) {
+            args[n++] = seg // Increments n after the value is used for the assignment. More performant than .push().
+            return regs[regs.patterns[i].toString()]
+          }
         }
       }
-    }
+    })()
   }
+
 }
 
 
