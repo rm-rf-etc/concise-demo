@@ -131,7 +131,6 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
       builder = new DomBuilder(this, el)
 
-console.log( 'parsed.helpers', parsed.helpers )
       if (parsed.helpers && parsed.helpers.length) {
         parsed.helpers.map(function(helper_str){
           //

@@ -1,19 +1,15 @@
 
 module.exports = function(list){
 
+  var new_item_input
+
   return {
     'div.width-12.columns.centered':{
       'a href="/" innerHTML="Sign-up"':0,
       'div.width-6.columns.centered':{
         'div.list-editor':{
           'form':function($){
-            var new_item_input
-
-            $.onSubmit(function(ev){
-              ev.preventDefault()
-              list.push({ checked:false, text:new_item_input.value })
-              new_item_input.value = ''
-            })
+            formLogic($)
             $.dom = {
             'input.full-width type="text" name="new-item-field"':function(){
               new_item_input = this
@@ -22,69 +18,78 @@ module.exports = function(list){
             }
           }
         },
-        'ul each(list)':forEachItem(function(a){return{
-          'li':{
-            'input type="checkbox"':a.inputCheckbox,
-            'input type="text"':a.itemTextInput,
-            'button.delete-this innerHTML="&times;"':a.deleteItemButton
-          }
-        }
-        }),
-        "button#delete.right innerHTML='clear completed'":function($){
-          $.onClick(function(){
-            function removeCompleted(item, idx){
-              if (item.checked) list.splice( list.indexOf(item), 1 )
-              else idx++
-
-              if (idx < list.length) removeCompleted(list[idx], idx)
+        'ul each(list)':function($,id,item){
+          var _ = forEachItem($,id,item)
+          $.dom = {
+            'li':{
+              'input type="checkbox"':_.checkbox,
+              'button.delete-this innerHTML="&times;"':_.button,
+              'input type="text"':_.input
             }
-            removeCompleted(list[0], 0)
-          })
-        }
+          }
+        },
+        "button#delete.right innerHTML='clear completed'":deleteButton
       }
     }
   }
 
 
-  function forEachItem(bindMarkup){
+  function formLogic($){
+    $.onSubmit(function(ev){
+      ev.preventDefault()
+      list.push({ checked:false, text:new_item_input.value })
+      new_item_input.value = ''
+    })
+  }
 
-    return function($,id,item){
 
-      $.dom = bindMarkup({
-        inputCheckbox: function($){
-          $.el.checked = item.checked
+  function deleteButton($){
+    $.onClick(function(){
+      function removeCompleted(item, idx){
+        if (item.checked) list.splice( list.indexOf(item), 1 )
+        else idx++
 
-          item.bind(item,'checked',function(val){ $.el.checked = item.checked })
+        if (idx < list.length) removeCompleted(list[idx], idx)
+      }
+      removeCompleted(list[0], 0)
+    })
+  }
 
-          $.onClick(function(ev){ item.checked = $.el.checked })
-        },
 
-        deleteItemButton: function($){
-          $.onClick(function(){
-            if (confirm('Delete this item?')) list.splice( list.indexOf(item), 1 )
+  function forEachItem($,id,item){
+
+    return {
+
+      checkbox: function($){
+        $.el.checked = item.checked
+
+        item.bind(item,'checked',function(val){ $.el.checked = item.checked })
+
+        $.onClick(function(ev){ item.checked = $.el.checked })
+      },
+
+      button: function($){
+        $.onClick(function(){
+          if (confirm('Delete this item?')) list.splice( list.indexOf(item), 1 )
+        })
+      },
+
+      input: function($){
+        item.fieldManager(function(input_handler, output_handler){
+
+          $.onInput(function(ev){
+            input_handler(function(){ item.text = $.el.value })
           })
-        },
 
-        itemTextInput: function($){
-          var field = this
-
-          item.fieldManager(function(input_handler, output_handler){
-
-            $.onInput(function(ev){
-              input_handler(function(){ item.text = field.value })
-            })
-
-            item.bind(item,'text',function(val){
-              output_handler(function(){ field.value = val })
-            })
-
+          item.bind(item,'text',function(val){
+            output_handler(function(){ $.el.value = val })
           })
 
-          field.value = item.text
-        }
-      })
-
+        })
+        $.el.value = item.text
+      }
     }
+
   }
 
 }
