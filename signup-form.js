@@ -60,11 +60,11 @@ http://inimino.org/~inimino/blog/javascript_semicolons
           var test_pass = getComparator(o.model,'pass','_pass')
 
 
-          o.model.onChange([ 'name', '_name' ], function(){
+          o.model.onInput([ 'name', '_name' ], function(){
             name_conf_o.setValid( test_name(), 'Entries do not match.' ); console.log( 'Sign-up form is valid? '+o.el.checkValidity() )
           })
 
-          o.model.onChange([ 'pass', '_pass' ], function(){
+          o.model.onInput([ 'pass', '_pass' ], function(){
             pass_conf_o.setValid( test_pass(), 'Entries do not match.' ); console.log( 'Sign-up form is valid? '+o.el.checkValidity() )
           })
 
@@ -89,7 +89,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
             })
           }}
 
-          o.model.onChange(['name', 'pass'], function(){
+          o.model.onInput(['name', 'pass'], function(){
             console.log( 'Sign-in form is valid? '+o.el.checkValidity() )
           })
 

@@ -33,7 +33,8 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
 ;(function(){
 
-  var Connected = require('./connected.js').Connected
+  var connected = require('./connected.js')
+  var Bindable = connected.Bindable
   var familyOf = require('./typeof.js').familyOf
   var typeOf = require('./typeof.js').typeOf
 
@@ -122,19 +123,21 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
         builder = new DomBuilder(this, el)
 
-        if (parsed.helpers) {
-          // if (typeOf(value) !== 'Function') throw new Error('DOM object "'+key+'" defined with helper method but has no function upon which to apply it.')
+        if (parsed.helpers && parsed.helpers.length) {
+          parsed.helpers.map(function(helper_str){
+            //
+            if (typeOf(value) !== 'Function') throw new Error('DOM object "'+key+'" defined with helper method but has no function upon which to apply it.')
 
-          // helper_fn = concise.helpers[ helper_str.split('(')[0] ]
+            helper_fn = concise.helpers[ helper_str.split('(')[0] ]
 
-          // data = /\((.+)\)/g.exec(helper_str)[1]
-          // data = data.split('.').reduce(function(object, prop){
-          //   return object[prop]
-          // },concise)
-
-          // helper_fn(builder,data,value)
-          // this.el.appendChild(el)
-          // // this.maintainer.include(key, el)
+            data = /\((.+)\)/g.exec(helper_str)[1]
+            data = data.split('.').reduce(function(object, prop){
+              return object[prop]
+            }, connected.models)
+            helper_fn(builder,data,value)
+            this.el.appendChild(el)
+            // this.maintainer.include(key, el)
+          }.bind(this))
         }
         else if (typeOf(value) === 'Object') {
           builder.dom = value
@@ -157,11 +160,15 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
     get:function(){ return this._model || this.parent.model }
   })
 
+  DomBuilder.prototype.onSubmit = function(cb){
+    this.el.addEventListener('submit',cb)
+  }
+
   DomBuilder.prototype.onClick = function(cb){
     this.el.addEventListener('click',cb)
   }
 
-  DomBuilder.prototype.onChange = function(cb){
+  DomBuilder.prototype.onInput = function(cb){
     this.el.addEventListener('input',cb)
   }
 
@@ -172,7 +179,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
   DomBuilder.prototype.formValidate = function(){
     console.log( 'FORM VALIDATE', this )
 
-    this._model = new Connected({})
+    this._model = new Bindable({})
     var model = this._model
     var done_for = ['input','textarea']
     model._new_property_ = ['_valid_', false]
@@ -183,7 +190,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
       if (done_for.indexOf(child.tagName.toLowerCase()) != -1 && child.name) {
         model._new_property_ = [child.name, '']
         // child.addEventListener('input',listener.bind(child))
-        Connected.bindField(child, model)
+        Bindable.bindField(child, model)
       }
       child = child.nextSibling
     }
@@ -241,7 +248,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
           if (keywords.indexOf(matches[0]) === -1) properties.push( [matches[0], true] )
           break;
 
-        case (/^\w\([^)]+\)$/.test(string)): //console.log('case',4)
+        case (/^\w+\([^)]+\)$/.test(string)): //console.log('case',4)
           if (! helpers) helpers = []
           helpers.push(string)
           break;
@@ -288,7 +295,8 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
     return {
       each: function(o,data,constructor){ //console.log( constructor )
 
-        data.bind( data, function(keyval, type){
+        if (! data) throw new Error('Helper received invalid data object with constructor: '+constructor.toString())
+        connected.bind(data, function(keyval, type){
           // Further optimizations are likely to come.
           // if (type === 'push') {
           //   constructor.call(o.el, o, keyval[0], keyval[1])

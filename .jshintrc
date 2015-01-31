@@ -22,6 +22,8 @@
     "attachEvent": false,
     "onload": false,
     "location": false,
-    "history": false
+    "history": false,
+    "confirm": false,
+    "alert": false
   }
 }

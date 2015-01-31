@@ -54,6 +54,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
   }
 
   var _bindables = []
+  var _named_models = {}
   var _events = new MicroEvent()
 
 
@@ -75,6 +76,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
   DEFINE(BindableObject.prototype, 'bind', { enumerable:false, configurable:false, value:bind })
   DEFINE(BindableObject.prototype, 'unbind', { enumerable:false, configurable:false, value:unbind })
   DEFINE(BindableObject.prototype, 'recompute', { enumerable:false, configurable:false, value:recompute })
+  DEFINE(BindableObject.prototype, 'fieldManager', { enumerable:false, configurable:false, value:fieldManager })
   DEFINE(BindableObject.prototype, 'onChange', { enumerable:false, configurable:false,
     value:function(props, cb){
       if (typeOf(props) !== 'Array') return
@@ -94,6 +96,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
     DEFINE(self, 'bind', { enumerable:false, configurable:false, value:bind })
     DEFINE(self, 'unbind', { enumerable:false, configurable:false, value:unbind })
     DEFINE(self, 'recompute', { enumerable:false, configurable:false, value:recompute })
+    DEFINE(self, 'fieldManager', { enumerable:false, configurable:false, value:fieldManager })
     DEFINE(self, '_new_property_', { enumerable:false, configurable:false,
       set:function(){ addProperty.apply(self, arguments) }
     })
@@ -307,6 +310,12 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
     return this
   }
 
+  function nameModel(name, model){
+    DEFINE(_named_models, name, {enumerable:false, configurable:true, writeable:true
+    , get:function(){ return model }
+    })
+  }
+
 
   /* Takes a form DOM object and a Binding object, and does the rest for you. */
 
@@ -396,15 +405,22 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
 
   if (typeof module !== 'undefined' && module.hasOwnProperty('exports')) {
-    module.exports = {
-      Connected: NewBindable
-    , Bindable: Bindable
+    var object = {
+    // , Bindable: Bindable
+      Bindable: NewBindable
     , familyOf: familyOf
     , typeOf: typeOf
+    , name: nameModel
+    , unbind: unbind
+    , bind: bind
     }
+    DEFINE(object,'models',{enumerable:true, configurable:false, writeable:false
+    , get:function(){ return _named_models }
+    })
+    module.exports = object
   } else {
+    // window.Bindable   = Bindable
     window.Connected  = NewBindable
-    window.Bindable   = Bindable
     window.familyOf   = familyOf
     window.typeOf     = typeOf
   }

@@ -38,7 +38,7 @@ function goForward(url){
 window.onpopstate = function(event){ doRoute(event.state.url) }
 
 function init(){
-  // history.replaceState( {url:location.pathname}, null, location.pathname )
+  history.replaceState( {url:location.pathname}, null, location.pathname )
   doRoute(location.pathname)
 }
 

@@ -26,11 +26,19 @@ module.exports = {
 /**
  * Calling this function adds a new route.
  */
-function router(url, f, c){ // c is for controller, f is for filters.
-  var $, nested
+function router(arg1, f, c){ // c is for controller, f is for filters.
+  var $, url, nested
 
-  if (typeof url !== 'string')
+  if (typeOf(arg1) === 'Array' && arg1.length && !f) {
+
+    arg1.map(function(r){ router.apply(null,r) })
+
+    return
+  }
+
+  if (typeof arg1 !== 'string')
     throw new Error('Router accepts only a string as the first argument.')
+  url = arg1
 
   c = arguments[arguments.length-1]
   f = (Array.isArray(f)) ? f : []
@@ -122,8 +130,8 @@ function branchBuildingLogic(cumulate, segment){
 }
 
 // This merges a branch object (nested objects representing a route path) into our route tree object.
-function treeMerge(to,from,fn){ console.log(to,from,fn)
-  Object.keys(from).map(function(prop){ console.log('property:',prop)
+function treeMerge(to,from,fn){ //console.log(to,from,fn)
+  Object.keys(from).map(function(prop){ //console.log('property:',prop)
 
     switch (true) {
 
