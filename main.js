@@ -22,6 +22,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
   concise.routes
   ('/', ctrls.HomeCtrl)
+  ('/join', ctrls.HomeCtrl)
   ('/todos', ctrls.TodoAllCtrl)
   ('/todos-complete', ctrls.TodoCheckedCtrl)
   ('/todos-incomplete', ctrls.TodoUncheckedCtrl)
