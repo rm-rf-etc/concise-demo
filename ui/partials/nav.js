@@ -1,8 +1,6 @@
 
 module.exports = {
-  'div.row 1': {
-    'button href="/" innerHTML="Sign-up"':0,
-  },
+  'a.auth-me href="/" innerHTML="login / register"':0,
   'div.row 2':{
     "h1 innerHTML='To-Do's'":0,
     'button href="/todos" innerHTML="All"':0,
