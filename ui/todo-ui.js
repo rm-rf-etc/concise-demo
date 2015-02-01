@@ -20,7 +20,9 @@ module.exports = function(list, show_when){
   var new_item_input
 
   return {
-    'page.width-12.column':{
+    'div.width-12.column':{
+      'a.auth-me href="/" innerHTML="login / register"':0,
+      "h1 innerHTML='To-Do's'":0,
       'div.nav':require('./partials/nav.js'),
       'div.width-6.columns.centered':{
         'div.list-editor':{

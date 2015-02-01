@@ -40,9 +40,13 @@ http://inimino.org/~inimino/blog/javascript_semicolons
   function bootstrap(){
 
     var list = new Bindable([
-      {checked:false, text:'buy almond milk'}
-    , {checked:false, text:'breakup with Katey'}
-    , {checked:true, text:'schedule dentist appointment'}
+      { checked:false, text:'buy almond milk' }
+    , { checked:false, text:'breakup with Katey' }
+    , { checked:false, text:'schedule dentist appointment' }
+    , { checked:true,  text:'end world hunger' }
+    , { checked:false, text:'go to swimming lessons' }
+    , { checked:true,  text:'get my haircut' }
+    , { checked:false, text:'enter the super duper sweetstakes' }
     ])
     connected.name('list',list)
 

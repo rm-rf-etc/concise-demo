@@ -20,7 +20,8 @@ module.exports = function($){
 
   return {
   "div.width-12.column":{
-    'div.nav':require('./partials/nav.js'),
+    'a.auth-me href="/todos" innerHTML="skip login"':0,
+    'h1 innerHTML="Welcome"':0,
     "div.width-6.centered":{
       "form 1 validate":function($){
         signup_form_el = $.el
