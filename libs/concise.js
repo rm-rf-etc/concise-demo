@@ -169,6 +169,14 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
     get:function(){ return this._model || this.parent.model }
   })
 
+  DomBuilder.prototype.onFocus = function(cb){
+    this.el.addEventListener('focus',cb)
+  }
+
+  DomBuilder.prototype.onBlur = function(cb){
+    this.el.addEventListener('blur',cb)
+  }
+
   DomBuilder.prototype.onSubmit = function(cb){
     this.el.addEventListener('submit',cb)
   }
