@@ -1,6 +1,5 @@
 
 
-var nav = require('./partials/nav.js')
 var filter = {
   'true': {
     'true': 'block',
@@ -22,15 +21,13 @@ module.exports = function(list, show_when){
 
   return {
     'page.width-12.column':{
-      'div.nav':nav,
+      'div.nav':require('./partials/nav.js'),
       'div.width-6.columns.centered':{
         'div.list-editor':{
           'form':function($){
             formLogic($)
             $.dom = {
-            'input.full-width type="text" name="new-item-field"':function(){
-              new_item_input = this
-            },
+            'input.full-width type="text" name="new-item-field"':function($){ new_item_input = $.el },
             'input type="submit"':0
             }
           }
