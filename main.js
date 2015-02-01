@@ -22,7 +22,9 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
   concise.routes
   ('/', ctrls.HomeCtrl)
-  ('/todos', ctrls.TodoCtrl)
+  ('/todos', ctrls.TodoAllCtrl)
+  ('/todos-complete', ctrls.TodoCheckedCtrl)
+  ('/todos-incomplete', ctrls.TodoUncheckedCtrl)
 
   // This is another style you can use to define routes.
   // concise.routes([
@@ -37,16 +39,25 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
   function controllers(){
 
+    var list = new Bindable([
+      {checked:false, text:'buy almond milk'}
+    , {checked:false, text:'breakup with Katey'}
+    , {checked:true, text:'schedule dentist appointment'}
+    ])
+    connected.name('list',list)
+
     return {
 
-      TodoCtrl: new concise.Controller('todo', function($){
-        var list = new Bindable([
-          {checked:false, text:'buy almond milk'}
-        , {checked:false, text:'schedule dentist appointment'}
-        , {checked:false, text:'breakup with Katey'}
-        ])
-        connected.name('list',list)
+      TodoAllCtrl: new concise.Controller('todo-all', function($){
         $.dom = uis.todo(list)
+      }),
+
+      TodoCheckedCtrl: new concise.Controller('todo-complete', function($){
+        $.dom = uis.todo(list,true)
+      }),
+
+      TodoUncheckedCtrl: new concise.Controller('todo-incomplete', function($){
+        $.dom = uis.todo(list,false)
       }),
 
       HomeCtrl: new concise.Controller('home', function($){

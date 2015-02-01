@@ -4,20 +4,24 @@ module.exports = runway
 
 
 
+var onclick_els = ['A','BUTTON']
+
 document.onclick = function(event) {
   event = event || window.event // IE specials
   var target = event.target || event.srcElement // IE specials
 
-  if (target.tagName === 'A') {
+  console.log('click happened:', target.dataset.href)
+
+  if (onclick_els.indexOf(target.tagName) !== -1) {
     event.preventDefault()
-    processLink.call(target)
+    processLink(target.href, target.dataset.ajax)
   }
 }
 
-function processLink(){
-  var href = this.href.replace(location.origin,'')
-  // console.log('processLink', this.href, href)
-  if (this.dataset.ajax !== 'none') {
+function processLink(href, ajax){
+  console.log('processLink', href)
+  href = href.replace(location.origin,'')
+  if (ajax !== 'none') {
     goForward(href)
     doRoute(href)
     return false
@@ -26,7 +30,7 @@ function processLink(){
 }
 
 function doRoute(href){
-  var ctrl = runway.finder(href)
+  var ctrl = runway.goto(href)
   if (ctrl) ctrl()
 }
 

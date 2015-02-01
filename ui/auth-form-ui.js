@@ -1,4 +1,7 @@
 
+
+var nav = require('./partials/nav.js')
+
 module.exports = function($){
 
   var signup_form_el
@@ -18,9 +21,9 @@ module.exports = function($){
   }
 
   return {
-  "row.width-12.column":{
-    'a href="/todos" innerHTML="To-Dos"':0,
-    "section.width-6.centered":{
+  "div.width-12.column":{
+    'div.nav':nav,
+    "div.width-6.centered":{
       "form 1 validate":function($){
         signup_form_el = this
 

@@ -1,11 +1,28 @@
 
-module.exports = function(list){
+
+var nav = require('./partials/nav.js')
+var filter = {
+  'true': {
+    'true': 'block',
+    'false': 'none'
+  },
+  'false': {
+    'true': 'none',
+    'false': 'block'
+  },
+  'undefined': {
+    'true': 'block',
+    'false': 'block'
+  }
+}
+
+module.exports = function(list, show_when){
 
   var new_item_input
 
   return {
-    'div.width-12.columns.centered':{
-      'a href="/" innerHTML="Sign-up"':0,
+    'page.width-12.column':{
+      'div.nav':nav,
       'div.width-6.columns.centered':{
         'div.list-editor':{
           'form':function($){
@@ -21,17 +38,19 @@ module.exports = function(list){
         'ul each(list)':function($,id,item){
           var _ = forEachItem($,id,item)
           $.dom = {
-            'li':{
-              'input type="checkbox"':_.checkbox,
-              'button.delete-this innerHTML="&times;"':_.button,
-              'input type="text"':_.input
-            }
-          }
-        },
+          'li':function($){
+            _.item($)
+            $.dom = {
+            'input type="checkbox"':_.checkbox,
+            'button.delete-this innerHTML="&times;"':_.button,
+            'input type="text"':_.input
+          }}
+        }},
         "button#delete.right innerHTML='clear completed'":deleteButton
       }
     }
   }
+
 
 
   function formLogic($){
@@ -59,6 +78,13 @@ module.exports = function(list){
   function forEachItem($,id,item){
 
     return {
+
+      item: function($){
+        $.el.style.display = filter[show_when][item.checked]
+        item.bind(item,'checked',function(){
+          $.el.style.display = filter[show_when][item.checked]
+        })
+      },
 
       checkbox: function($){
         $.el.checked = item.checked

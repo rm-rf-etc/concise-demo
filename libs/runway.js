@@ -18,7 +18,7 @@ var wildcards = {
 
 module.exports = {
   routes: router
-, finder: pathMatcher
+, goto: pathMatcher
 }
 
 

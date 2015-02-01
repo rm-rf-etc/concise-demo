@@ -45,7 +45,10 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
   var MicroEvent = require('microevent')
   var _controller_events = new MicroEvent()
 
-  concise.routes = require('./runway-browser.js').routes
+  var runway = require('./runway-browser.js')
+  Object.keys(runway).map(function(prop){
+    concise[prop] = runway[prop]
+  })
 
 
   /*
@@ -209,8 +212,18 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
   /* Takes a CSS selector-style string and generates corresponding real DOM element. */
 
+  var _reg = ''
+  _reg += "(\\w+[\\w-]*(?:\\.\\w+)*=['].*?['])(?=\\s[\\w\\d.]+(?:[=(]|$))" + '|'
+  _reg += '(\\w+[\\w-]*(?:\\.\\w+)*=["].*?["])(?=\\s[\\w\\d.]+(?:[=(]|$))' + '|'
+  _reg += "(\\w+[\\w-]*(?:\\.\\w+)*=['].*?['])$" + '|'
+  _reg += '(\\w+[\\w-]*(?:\\.\\w+)*=["].*?["])$' + '|'
+  _reg += '(\\w+[\\w-]*[(]\\w(?:[\\w\\d]+|[\\w\\d.][^.])*[)])$' + '|'
+  _reg += '([\\w\\d-]+)'
+  _reg = new RegExp(_reg,'g')
+  // var _reg = /(\w+[\w-]*(?:\.\w+)*=['].*?['])(?=\s[\w\d.]+(?:[=(]|$))|(\w+[\w-]*(?:\.\w+)*=["].*?["])(?=\s[\w\d.]+(?:[=(]|$))|(\w+[\w-]*(?:\.\w+)*=['].*?['])$|(\w+[\w-]*(?:\.\w+)*=["].*?["])$|(\w+[\w-]*[(]\w(?:[\w\d]+|[\w\d.][^.])*[)])$|([\w\d-]+)/g
+
   function parseElementString(desc){
-    var el=null, parts, tag_id_classes, props_helpers, tag='', id='', classes=[], regex=null, matches=true, properties=[], tokens, validate=false, helpers=[]
+    var el=null, parts, tag_id_classes, props_helpers, tag='', id='', classes=[], matches=true, properties=[], tokens, validate=false, helpers=[]
     var keywords = ['validate']
 
     if (/^[^\w]/g.test(desc)) throw new Error("Descriptor doesn't begin with a tag name: "+desc)
@@ -243,21 +256,13 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
 
     // Now for the hard stuff. Handling property values and helper referrences.
-    /** Here's the expression broken down into its constituent parts:
-       (\w+(?:\.\w+)*=['].*?['])(?=\s[\w\d.]+(?:[=(]|$))
-     | (\w+(?:\.\w+)*=["].*?["])(?=\s[\w\d.]+(?:[=(]|$))
-     | (\w+(?:\.\w+)*=['].*?['])$
-     | (\w+(?:\.\w+)*=["].*?["])$
-     | (\w+[(]\w(?:[\w\d]+|[\w\d.][^.])*[)])$
-     | ([\w\d-]+)/g
-     */
+
     if (parts[2]) {
       props_helpers = parts[2]
 
 // console.log( 'BEFORE', props_helpers ) // KEEP THIS FOR FUTURE DEBUGGING
 
-      var match_props_and_helpers = /(\w+(?:\.\w+)*=['].*?['])(?=\s[\w\d.]+(?:[=(]|$))|(\w+(?:\.\w+)*=["].*?["])(?=\s[\w\d.]+(?:[=(]|$))|(\w+(?:\.\w+)*=['].*?['])$|(\w+(?:\.\w+)*=["].*?["])$|(\w+[(]\w(?:[\w\d]+|[\w\d.][^.])*[)])$|([\w\d-]+)/g
-      tokens = props_helpers.match(match_props_and_helpers)
+      tokens = props_helpers.match(_reg)
       if (/\w+\(.*\)$/g.test(props_helpers) && /\w+\((?:[^\w].*|.*[^\w])\)$/g.test(props_helpers))
         throw new Error('Invalid helper definition: '+props_helpers)
 
@@ -274,9 +279,9 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
             if (keywords.indexOf(matches[0]) === -1) properties[properties.length] = [matches[0], true]
             break
 
-          case (/^(\w[\w\d.]*)=["'](.*)["']$/.test(string)):
+          case (/^(\w[\w\d-.]*)=["'](.*)["']$/.test(string)):
             var property_path
-            matches = /^([\w.]+)=["']((?:\"|\'|[^'"])*)["']$/.exec(string)
+            matches = /^([\w\d-.]+)=["']((?:\"|\'|[^'"])*)["']$/.exec(string)
             property_path = matches[1].split('.')
             property_path[property_path.length] = matches[2]
             properties[properties.length] = property_path

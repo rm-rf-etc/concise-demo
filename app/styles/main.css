@@ -1,6 +1,8 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { width: 100%; }
 body { width: 70%; margin: auto; margin-top: 3rem; }
+.nav { display: table; margin: auto; }
+.row { display: block; }
 ul { list-style-type: none; }
 form { width: 100%; }
 li input[type="text"] { width: 80%; }
