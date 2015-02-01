@@ -10,9 +10,8 @@ document.onclick = function(event) {
   event = event || window.event // IE specials
   var target = event.target || event.srcElement // IE specials
 
-  console.log('click happened:', target.dataset.href)
-
-  if (onclick_els.indexOf(target.tagName) !== -1) {
+  // console.log('click happened:', target.dataset.href)
+  if (onclick_els.indexOf(target.tagName) !== -1 && target.href) {
     event.preventDefault()
     processLink(target.href, target.dataset.ajax)
   }

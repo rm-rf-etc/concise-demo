@@ -18,7 +18,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
   , auth_me: require('./ui/auth-form-ui.js')
   }
 
-  var ctrls = controllers() // I wanted routes defined above controller functions, so I put them in a named function.
+  var ctrls = bootstrap() // I wanted routes defined above controller functions, so I put them in a named function.
 
   concise.routes
   ('/', ctrls.HomeCtrl)
@@ -37,7 +37,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
   window.connected = connected
 
 
-  function controllers(){
+  function bootstrap(){
 
     var list = new Bindable([
       {checked:false, text:'buy almond milk'}

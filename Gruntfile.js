@@ -6,7 +6,7 @@ module.exports = function (grunt) {
         browserify: {
             'dev': {
                 'src': './main.js',
-                'dest': 'app/scripts/bundle.js',
+                'dest': 'public/scripts/bundle.js',
                 'options': {
                     'debug': true,
                     'watch': true,
@@ -16,7 +16,7 @@ module.exports = function (grunt) {
             },
             'release': {
                 'src': './main.js',
-                'dest': 'app/scripts/bundle.js',
+                'dest': 'public/scripts/bundle.js',
                 'options': {
                     'debug': false,
                     'verbose': false

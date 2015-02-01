@@ -123,7 +123,6 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
         parsed = parseElementString(key)
         if (parsed.validate) this.validates = true
         el = parsed.el
-        // console.log( 'USES VALIDATION', parsed.validate )
       }
       else return
 
