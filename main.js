@@ -49,24 +49,27 @@ http://inimino.org/~inimino/blog/javascript_semicolons
     , { checked:true,  text:'get my haircut' }
     , { checked:false, text:'enter the super duper sweetstakes' }
     ])
-    connected.name('list',list)
+    concise.models.list = list
+
 
     return {
 
       TodoAllCtrl: new concise.Controller('todo-all', function(){
-        this.view = uis.todo(list)
+        this.view = uis.todo
       }),
 
       TodoCheckedCtrl: new concise.Controller('todo-complete', function(){
-        this.view = uis.todo(list,true)
+        this.show_when = true
+        this.view = uis.todo
       }),
 
       TodoUncheckedCtrl: new concise.Controller('todo-incomplete', function(){
-        this.view = uis.todo(list,false)
+        this.show_when = false
+        this.view = uis.todo
       }),
 
       HomeCtrl: new concise.Controller('home', function(){
-        this.view = uis.auth_me(this)
+        this.view = uis.auth_me
       })
 
     }

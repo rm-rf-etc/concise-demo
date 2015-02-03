@@ -15,9 +15,11 @@ var filter = {
   }
 }
 
-module.exports = function(list, show_when){
+module.exports = function(ctrl){
 
   var new_item_input
+  var list = ctrl.models.list
+  var show_when = ctrl.show_when
 
   return {
     'div.width-12.column':{

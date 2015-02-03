@@ -54,7 +54,6 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
   }
 
   var _bindables = []
-  var _named_models = {}
   var _events = new MicroEvent()
 
 
@@ -310,11 +309,6 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
     return this
   }
 
-  function nameModel(name, model){
-    DEFINE(_named_models, name, {enumerable:false, configurable:true, writeable:true
-    , get:function(){ return model }
-    })
-  }
 
 
   /* Takes a form DOM object and a Binding object, and does the rest for you. */
@@ -410,13 +404,9 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
       Bindable: NewBindable
     , familyOf: familyOf
     , typeOf: typeOf
-    , name: nameModel
     , unbind: unbind
     , bind: bind
     }
-    DEFINE(object,'models',{enumerable:true, configurable:false, writeable:false
-    , get:function(){ return _named_models }
-    })
     module.exports = object
   } else {
     // window.Bindable   = Bindable

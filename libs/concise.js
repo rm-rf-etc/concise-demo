@@ -75,7 +75,9 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
   Concise.prototype.helpers = Helpers()
 
-  Concise.prototype.Controller = function(name, constructor){
+  Concise.prototype.Controller = Controller
+
+  function Controller(name /*, constructor */){
 
     this._id = name || Math.random().toString().split('.')[1]
 
@@ -84,7 +86,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
     this.builder = new DomBuilder(null, view)
 
-    constructor.call(this)
+    arguments[arguments.length-1].call(this)
 
     return function(){
       _controller_events.trigger(this._id)
@@ -92,12 +94,19 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
     }
   }
 
-  Concise.prototype.Controller.prototype.onActive = function(fn){
+  // How the class/method structure will be organized is still being worked out.
+  // This works for now.
+  Concise.prototype.models = {}
+  Controller.prototype.models = Concise.prototype.models
+
+  Controller.prototype.onActive = function(fn){
     _controller_events.bind(this._id, fn)
   }
 
-  DEFINE(Concise.prototype.Controller.prototype, 'view', {enumerable:false, configurable:false
-  , set:function(view_obj){ this.builder.dom = view_obj }
+  DEFINE(Controller.prototype, 'view', {enumerable:false, configurable:false
+  , set:function(fn){
+      this.builder.dom = fn(this)
+    }
   })
 
 
@@ -147,7 +156,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
           data = /\((.+)\)/g.exec(helper_str)[1]
           data = data.split('.').reduce(function(object, prop){
             return object[prop]
-          }, connected.models)
+          }, concise.models)
           builder = new DomBuilder(this, el)
           helper_fn(builder,data,value)
           this.el.appendChild(el)
