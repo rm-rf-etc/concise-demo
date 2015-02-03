@@ -22,7 +22,7 @@ module.exports = function(list, show_when){
   return {
     'div.width-12.column':{
       'a.auth-me href="/join" innerHTML="login / register"':0,
-      "h1 innerHTML='To-Do's'":0,
+      'h1 innerHTML="To-Do\'s"':0,
       'div.nav':require('./partials/nav.js'),
       'div.width-6.columns.centered':{
         'div.list-editor':{

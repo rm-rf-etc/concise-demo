@@ -53,20 +53,20 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
     return {
 
-      TodoAllCtrl: new concise.Controller('todo-all', function($){
-        $.dom = uis.todo(list)
+      TodoAllCtrl: new concise.Controller('todo-all', function(){
+        this.view = uis.todo(list)
       }),
 
-      TodoCheckedCtrl: new concise.Controller('todo-complete', function($){
-        $.dom = uis.todo(list,true)
+      TodoCheckedCtrl: new concise.Controller('todo-complete', function(){
+        this.view = uis.todo(list,true)
       }),
 
-      TodoUncheckedCtrl: new concise.Controller('todo-incomplete', function($){
-        $.dom = uis.todo(list,false)
+      TodoUncheckedCtrl: new concise.Controller('todo-incomplete', function(){
+        this.view = uis.todo(list,false)
       }),
 
-      HomeCtrl: new concise.Controller('home', function($){
-        $.dom = uis.auth_me($)
+      HomeCtrl: new concise.Controller('home', function(){
+        this.view = uis.auth_me(this)
       })
 
     }

@@ -1,6 +1,6 @@
 
 
-module.exports = function($){
+module.exports = function(ctrl){
 
   var signup_form_el
   var signin_form_el
@@ -11,7 +11,7 @@ module.exports = function($){
   var test_name
   var test_pass
 
-  $.onActive(function(){
+  ctrl.onActive(function(){
     if (signup_form_el.style.display === 'none') {
       signin_form_el.style.display = 'none'
       signup_form_el.style.display = 'block'
@@ -22,7 +22,7 @@ module.exports = function($){
   "div.width-12.column":{
     'a.auth-me href="/todos" innerHTML="skip login"':0,
     'h1 innerHTML="Welcome"':0,
-    "div.width-6.centered":{
+    'div.width-6.centered':{
       "form 1 validate":function($){
         signup_form_el = $.el
         $.dom = {

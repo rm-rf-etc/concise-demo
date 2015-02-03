@@ -59,7 +59,8 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
   function Concise(){
     this.current_view = null
-    var view = document.createElement('view')
+    var view = document.createElement('div')
+    view.id = 'view'
     var body = document.querySelector('body')
     body.insertBefore(view, body.firstChild)
 
@@ -78,13 +79,12 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
     this._id = name || Math.random().toString().split('.')[1]
 
-    var view = document.createElement('container')
+    var view = document.createElement('div')
     view.id = name || this._id
 
-    var builder = new DomBuilder(null, view)
-    builder.onActive = this.onActive
+    this.builder = new DomBuilder(null, view)
 
-    constructor.call(this, builder)
+    constructor.call(this)
 
     return function(){
       _controller_events.trigger(this._id)
@@ -95,6 +95,10 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
   Concise.prototype.Controller.prototype.onActive = function(fn){
     _controller_events.bind(this._id, fn)
   }
+
+  DEFINE(Concise.prototype.Controller.prototype, 'view', {enumerable:false, configurable:false
+  , set:function(view_obj){ this.builder.dom = view_obj }
+  })
 
 
 
@@ -131,7 +135,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
         return
       }
 
-      builder = new DomBuilder(this, el)
+      // builder = new DomBuilder(this, el)
 
       if (parsed.helpers && parsed.helpers.length) {
         parsed.helpers.map(function(helper_str){
@@ -144,17 +148,21 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
           data = data.split('.').reduce(function(object, prop){
             return object[prop]
           }, connected.models)
+          builder = new DomBuilder(this, el)
           helper_fn(builder,data,value)
           this.el.appendChild(el)
           // this.maintainer.include(key, el)
         }.bind(this))
       }
       else if (typeOf(value) === 'Object') {
-        builder.dom = value
+        // builder = new DomBuilder(this, el)
+        // builder.dom = value
+        domBuilderMethod.call({ el:el, parent:this.parent }, value)
         this.el.appendChild(el)
         // this.maintainer.include(key, el)
       }
       else if (typeOf(value) === 'Function') {
+        builder = new DomBuilder(this, el)
         value.call(el,builder)
         this.el.appendChild(el)
         // this.maintainer.include(key, el)
@@ -162,7 +170,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
     }.bind(this))
 
-    if (this.parent.validates && this.el.tagName === 'FORM') this.formValidate()
+    if (this.parent && this.parent.validates && this.el.tagName === 'FORM') this.formValidate()
   }
 
   DEFINE(DomBuilder.prototype, 'model', {enumerable:false, configurable:false, set:function(){},
