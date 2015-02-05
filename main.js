@@ -18,14 +18,20 @@ http://inimino.org/~inimino/blog/javascript_semicolons
   , auth_me: require('./ui/auth-form-ui.js')
   }
 
-  var ctrls = bootstrap() // I wanted routes defined above controller functions, so I put them in a named function.
+  var ctrls, list
 
-  concise.routes
-  ('/', ctrls.HomeCtrl)
-  ('/join', ctrls.HomeCtrl)
-  ('/todos', ctrls.TodoAllCtrl)
-  ('/todos-complete', ctrls.TodoCheckedCtrl)
-  ('/todos-incomplete', ctrls.TodoUncheckedCtrl)
+  concise.get('/data/todos.json',function(data){
+    concise.models.list = list = new Bindable(data)
+
+    ctrls = bootstrap() // I wanted routes defined above controller functions, so I put them in a named function.
+
+    concise.routes
+    ('/', ctrls.HomeCtrl)
+    ('/join', ctrls.HomeCtrl)
+    ('/todos', ctrls.TodoAllCtrl)
+    ('/todos-complete', ctrls.TodoCheckedCtrl)
+    ('/todos-incomplete', ctrls.TodoUncheckedCtrl)
+  })
 
   // This is another style you can use to define routes.
   // concise.routes([
@@ -39,18 +45,6 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
 
   function bootstrap(){
-
-    var list = new Bindable([
-      { checked:false, text:'buy almond milk' }
-    , { checked:false, text:'breakup with Katey' }
-    , { checked:false, text:'schedule dentist appointment' }
-    , { checked:true,  text:'end world hunger' }
-    , { checked:false, text:'go to swimming lessons' }
-    , { checked:true,  text:'get my haircut' }
-    , { checked:false, text:'enter the super duper sweetstakes' }
-    ])
-    concise.models.list = list
-
 
     return {
 

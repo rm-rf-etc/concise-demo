@@ -22,35 +22,34 @@ module.exports = function(ctrl){
   var show_when = ctrl.show_when
 
   return {
-    'div.width-12.column':{
-      'a.auth-me href="/join" innerHTML="login / register"':0,
-      'h1 innerHTML="To-Do\'s"':0,
-      'div.nav':require('./partials/nav.js'),
-      'div.width-6.columns.centered':{
-        'div.list-editor':{
-          'form':function($){
-            formLogic($)
-            $.dom = {
-            'input.full-width type="text" name="new-item-field"':function($){ new_item_input = $.el },
-            'input type="submit"':0
-            }
-          }
-        },
-        'ul each(list)':function($,id,item){
-          var _ = forEachItem($,id,item)
+  'div.width-12.column':{
+    'a.auth-me href="/join" innerHTML="login / register"':0,
+    'h1 innerHTML="To-Do\'s"':0,
+    'div.nav':require('./partials/nav.js'),
+    'div.width-6.columns.centered':{
+      'div.list-editor':{
+        'form':function($){
+          formLogic($)
           $.dom = {
-          'li':function($){
-            _.item($)
-            $.dom = {
-            'input type="checkbox"':_.checkbox,
-            'button.delete-this innerHTML="&times;"':_.button,
-            'input type="text"':_.input
-          }}
-        }},
-        "button#delete.right innerHTML='clear completed'":deleteButton
-      }
+          'input.full-width type="text" name="new-item-field"':function($){ new_item_input = $.el },
+          'input type="submit"':0
+          }
+        }
+      },
+      'ul each(list)':function($,id,item){
+        var _ = forEachItem($,id,item)
+        $.dom = {
+        'li':function($){
+          _.item($)
+          $.dom = {
+          'input type="checkbox"':_.checkbox,
+          'button.delete-this innerHTML="&times;"':_.button,
+          'input type="text"':_.input
+        }}
+      }},
+      "button#delete.right innerHTML='clear completed'":deleteButton
     }
-  }
+  }}
 
 
 

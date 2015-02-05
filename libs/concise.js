@@ -73,6 +73,25 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
     this.view_body.appendChild(view)
   }
 
+  Concise.prototype.get = function(path, cb){
+    var request = new XMLHttpRequest()
+
+    request.onload = function(){
+
+      if (request.status >= 200 && request.status < 400) {
+
+        try { cb( JSON.parse(request.responseText) ) }
+        catch (e) { console.log(e) }
+
+      }
+      else console.log('failed')
+
+    }
+
+    request.open('GET', path, true)
+    request.send()
+  }
+
   Concise.prototype.helpers = Helpers()
 
   Concise.prototype.Controller = Controller

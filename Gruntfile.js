@@ -48,14 +48,7 @@ module.exports = function(grunt){
         watchTask: true,
         server:{
           baseDir: './public',
-          middleware: function(req, res, next){
-            if (/^\/styles|^\/scripts|^\/favicon.ico/g.test(req.url)) next()
-            else {
-              // console.log( 'index!', req.url )
-              res.writeHeader(200, { "Content-Type":"text/html" })
-              res.end( index )
-            }
-          }
+          middleware: require('./libs/routing.js')
         }
       }
     }
