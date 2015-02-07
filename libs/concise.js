@@ -74,7 +74,8 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
   }
 
   Concise.prototype.get = function(path, cb){
-    var request = new XMLHttpRequest()
+    var xhr = window.XMLHttpRequest || ActiveXObject
+    var request = new xhr('MSXML2.XMLHTTP.3.0')
 
     request.onload = function(){
 
@@ -88,7 +89,7 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
     }
 
-    request.open('GET', path, true)
+    request.open('GET', path, 1)
     request.send()
   }
 
