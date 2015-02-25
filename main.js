@@ -20,9 +20,19 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
   var ctrls, list
 
-  concise.get('/data/todos.json',function(data){
-    concise.models.list = list = new Bindable(data)
+  // concise.get('/data/todos.json',function(data){})
 
+  var api = new Firebase('https://blazing-inferno-1661.firebaseio.com/')
+
+  api.child('users/rob/todos').on('value', function(snapshot){
+
+    concise.models.list = list = new Bindable( snapshot.val() )
+
+    start()
+  })
+
+
+  function start(){
     ctrls = bootstrap() // I wanted routes defined above controller functions, so I put them in a named function.
 
     concise.routes
@@ -31,13 +41,8 @@ http://inimino.org/~inimino/blog/javascript_semicolons
     ('/todos', ctrls.TodoAllCtrl)
     ('/todos-complete', ctrls.TodoCheckedCtrl)
     ('/todos-incomplete', ctrls.TodoUncheckedCtrl)
-  })
+  }
 
-  // This is another style you can use to define routes.
-  // concise.routes([
-  //   ['/', HomeCtrl()]
-  // , ['/todos', TodoCtrl()]
-  // ])
 
   // v For use in debugging.
   window.concise = concise

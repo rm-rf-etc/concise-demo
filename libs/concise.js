@@ -58,9 +58,12 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
   */
 
   function Concise(){
+
     this.current_view = null
+
     var view = document.createElement('div')
     view.id = 'view'
+
     var body = document.querySelector('body')
     body.insertBefore(view, body.firstChild)
 
@@ -94,8 +97,13 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
   }
 
   Concise.prototype.helpers = Helpers()
-
   Concise.prototype.Controller = Controller
+  Concise.prototype.ViewLayout = ViewLayout
+
+  // How the class/method structure will be organized is still being worked out.
+  // This works for now.
+  Concise.prototype.models = Controller.prototype.models = {}
+
 
   function Controller(name /*, constructor */){
 
@@ -113,11 +121,6 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
       concise.setView(view)
     }
   }
-
-  // How the class/method structure will be organized is still being worked out.
-  // This works for now.
-  Concise.prototype.models = {}
-  Controller.prototype.models = Concise.prototype.models
 
   Controller.prototype.onActive = function(fn){
     _controller_events.bind(this._id, fn)
@@ -367,6 +370,16 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
       return false
     }
     else return true
+  }
+
+
+
+  function ViewLayout(dom){
+    //
+
+    return function(){
+      //
+    }
   }
 
 

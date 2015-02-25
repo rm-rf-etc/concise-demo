@@ -48,7 +48,7 @@ module.exports = function(grunt){
         watchTask: true,
         server:{
           baseDir: './public',
-          middleware: require('./libs/routing.js')
+          middleware: require('./app/routing.js')
         }
       }
     }

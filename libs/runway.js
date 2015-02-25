@@ -8,7 +8,10 @@
 var typeOf = require('./typeof.js').typeOf
 
 var routes_tree = Object.create(null)
+var init_fn
 var logger
+var countdown = 0
+var intvl
 var wildcards = {
   '{int}': '([1-9][0-9]*)',
   '{any}': '(.*)',
@@ -19,6 +22,19 @@ var wildcards = {
 module.exports = {
   routes: router
 , goto: pathMatcher
+, whenReady: function(fn){ init_fn = fn }
+}
+
+
+function launch(){
+  console.log('Waiting for routes to be defined.', countdown)
+  if (countdown === 0 && typeof init_fn === 'function') {
+    init_fn()
+    clearInterval(intvl)
+  }
+  else {
+    countdown = countdown === 0 ? 0 : countdown-1
+  }
 }
 
 
@@ -26,7 +42,10 @@ module.exports = {
 /**
  * Calling this function adds a new route.
  */
-function router(arg1, f, c){ // c is for controller, f is for filters.
+function router(arg1, f, c){
+  if (! countdown && !intvl) intvl = setInterval(launch,3)
+  else countdown++
+
   var $, url, nested
 
   if (typeOf(arg1) === 'Array' && arg1.length && !f) {

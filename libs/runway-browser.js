@@ -41,8 +41,10 @@ function goForward(url){
 window.onpopstate = function(event){ doRoute(event.state.url) }
 
 function init(){
-  history.replaceState( {url:location.pathname}, null, location.pathname )
-  doRoute(location.pathname)
+  runway.whenReady(function(){
+    history.replaceState( {url:location.pathname}, null, location.pathname )
+    doRoute(location.pathname)
+  })
 }
 
 window.addEventListener ? addEventListener('load', init, false) : window.attachEvent ? attachEvent('onload', init) : (onload = init)
