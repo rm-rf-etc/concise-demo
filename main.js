@@ -7,6 +7,8 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
 */
 
+var USE_FIREBASE = false
+
 
 ;(function(){
 
@@ -20,16 +22,28 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
   var ctrls, list
 
-  // concise.get('/data/todos.json',function(data){})
+  if (USE_FIREBASE) {
 
-  var api = new Firebase('https://blazing-inferno-1661.firebaseio.com/')
+    concise.get('/data/todos.json',function(data){
 
-  api.child('users/rob/todos').on('value', function(snapshot){
+      concise.models.list = list = new Bindable( data )
 
-    concise.models.list = list = new Bindable( snapshot.val() )
+      start()
 
-    start()
-  })
+    })
+
+  } else {
+
+    var api = new Firebase('https://blazing-inferno-1661.firebaseio.com/')
+
+    api.child('users/rob/todos').on('value', function(snapshot){
+
+      concise.models.list = list = new Bindable( snapshot.val() )
+
+      start()
+    })
+
+  }
 
 
   function start(){
