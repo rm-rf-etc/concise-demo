@@ -7,6 +7,8 @@ _Concise.js_ is an experimental frontend framework. The general philosophy is to
 
 ## Demo
 
+After `npm install`, add your `/etc/hosts` entry and then open in the browser. This project uses the browserSync built-in server, and running `grunt` starts the server. `app/routing.js` provides a read-only backend, or you can use the firebase endpoint. See `main.js`.
+
 See [todo-ui.js](//github.com/rm-rf-etc/concise/blob/master/ui/todo-ui.js).
 See [auth-form-ui.js](//github.com/rm-rf-etc/concise/blob/master/ui/auth-form-ui.js).
 
