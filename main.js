@@ -24,16 +24,6 @@ var USE_FIREBASE = false
 
   if (USE_FIREBASE) {
 
-    concise.get('/data/todos.json',function(data){
-
-      concise.models.list = list = new Bindable( data )
-
-      start()
-
-    })
-
-  } else {
-
     var api = new Firebase('https://blazing-inferno-1661.firebaseio.com/')
 
     api.child('users/rob/todos').on('value', function(snapshot){
@@ -41,6 +31,16 @@ var USE_FIREBASE = false
       concise.models.list = list = new Bindable( snapshot.val() )
 
       start()
+    })
+
+  } else {
+
+    concise.get('/data/todos.json',function(data){
+
+      concise.models.list = list = new Bindable( data )
+
+      start()
+
     })
 
   }
