@@ -1,4 +1,9 @@
 
+/*
+ * open http://localhost:3002/ in your browser.
+ */
+
+
 var index = require('fs').readFileSync('./public/index.html')
 // var browserSync = require('browser-sync')
 // var browserSyncGrunt = require('grunt-browser-sync')
@@ -41,9 +46,9 @@ module.exports = function(grunt){
     },
     browserSync:{
       bsFiles:{
-        src: ['public/scripts/*', 'public/styles/*', 'public/index.html']
+        src: ['public/scripts/*', 'public/styles/*', 'public/index.html', 'app/*']
       },
-      options:{
+      options:{ // open http://localhost:3002/ in your browser.
         open: false,
         watchTask: true,
         server:{

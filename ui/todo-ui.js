@@ -17,48 +17,57 @@ var filter = {
 
 module.exports = function(ctrl){
 
-  var new_item_input
+  // var new_item_input
   var list = ctrl.models.list
   var show_when = ctrl.show_when
 
   return {
-  'div.width-12.column':{
-    'a.auth-me href="/join" innerHTML="login / register"':0,
-    'h1 innerHTML="To-Do\'s"':0,
-    'div.nav':require('./partials/nav.js'),
-    'div.width-6.columns.centered':{
-      'div.list-editor':{
-        'form':function($){
-          formLogic($)
-          $.dom = {
-          'input.full-width type="text" name="new-item-field"':function($){ new_item_input = $.el },
-          'input type="submit"':0
+    'div.width-12.column':{
+      'a.auth-me href="/join" innerHTML="login / register"':0,
+      'h1 innerHTML="To-Do\'s"':0,
+      'div.nav':require('./partials/nav.js'),
+      'div.width-6.columns.centered':{
+        'div.list-editor':{
+          'form':function($){
+            formLogic.call(this,$)
+            $.dom = {
+            'input.full-width type="text" name="new-item-field"':this.newItemInput,
+            'input type="submit"':0
+            }
           }
-        }
-      },
-      'ul each(list)':function($,id,item){
-        var _ = forEachItem($,id,item)
-        $.dom = {
-        'li':function($){
-          _.item($)
+        },
+        'ul each(list)':function($,id,item){
+          forEachItem.call(this,$,id,item)
+          var ul_parent = this
           $.dom = {
-          'input type="checkbox"':_.checkbox,
-          'button.delete-this innerHTML="&times;"':_.button,
-          'input type="text"':_.input
-        }}
-      }},
-      "button#delete.right innerHTML='clear completed'":deleteButton
+          'li':function($){
+            ul_parent.liChild($)
+            $.dom = {
+            'input type="checkbox"':ul_parent.itemCheckbox,
+            'button.delete-this innerHTML="&times;"':ul_parent.itemDelete,
+            'input type="text"':ul_parent.itemInput
+            }
+          }
+        }},
+        "button#delete.right innerHTML='clear completed'":deleteButton
+      }
     }
-  }}
+  }
 
 
 
   function formLogic($){
+    var new_item_input = null
+
     $.onSubmit(function(ev){
       ev.preventDefault()
       list.push({ checked:false, text:new_item_input.value })
       new_item_input.value = ''
     })
+
+    this.newItemInput = function($){
+      new_item_input = $.el
+    }
   }
 
 
@@ -77,43 +86,40 @@ module.exports = function(ctrl){
 
   function forEachItem($,id,item){
 
-    return {
-
-      item: function($){
+    this.liChild = function($){
+      $.el.style.display = filter[show_when][item.checked]
+      item.bind(item,'checked',function(){
         $.el.style.display = filter[show_when][item.checked]
-        item.bind(item,'checked',function(){
-          $.el.style.display = filter[show_when][item.checked]
+      })
+    }
+
+    this.itemCheckbox = function($){
+      $.el.checked = item.checked
+
+      item.bind(item,'checked',function(val){ $.el.checked = item.checked })
+
+      $.onClick(function(ev){ item.checked = $.el.checked })
+    }
+
+    this.itemDelete = function($){
+      $.onClick(function(){
+        if (confirm('Delete this item?')) list.splice( list.indexOf(item), 1 )
+      })
+    }
+
+    this.itemInput = function($){
+      item.fieldManager(function(input_handler, output_handler){
+
+        $.onInput(function(ev){
+          input_handler(function(){ item.text = $.el.value })
         })
-      },
 
-      checkbox: function($){
-        $.el.checked = item.checked
-
-        item.bind(item,'checked',function(val){ $.el.checked = item.checked })
-
-        $.onClick(function(ev){ item.checked = $.el.checked })
-      },
-
-      button: function($){
-        $.onClick(function(){
-          if (confirm('Delete this item?')) list.splice( list.indexOf(item), 1 )
+        item.bind(item,'text',function(val){
+          output_handler(function(){ $.el.value = val })
         })
-      },
 
-      input: function($){
-        item.fieldManager(function(input_handler, output_handler){
-
-          $.onInput(function(ev){
-            input_handler(function(){ item.text = $.el.value })
-          })
-
-          item.bind(item,'text',function(val){
-            output_handler(function(){ $.el.value = val })
-          })
-
-        })
-        $.el.value = item.text
-      }
+      })
+      $.el.value = item.text
     }
 
   }
