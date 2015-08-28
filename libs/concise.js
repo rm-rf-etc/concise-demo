@@ -26,6 +26,8 @@ THE SOFTWARE.
 /*
 
 Semi-colon line terminators are just FUD. If your minifier can't handle this code, switch to one that is JS-compliant.
+http://blog.izs.me/post/2353458699/an-open-letter-to-javascript-leaders-regarding
+http://inimino.org/~inimino/blog/javascript_semicolons
 
 */
 
