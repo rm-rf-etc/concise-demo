@@ -1,6 +1,6 @@
 
 /*
- * open http://localhost:3002/ in your browser.
+ * open http://localhost:3000/ in your browser.
  */
 
 
