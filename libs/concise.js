@@ -40,8 +40,8 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 	global.familyOf = require('./typeof.js').familyOf
 	global.typeOf = require('./typeof.js').typeOf
 
-	var connected = require('./connected.js')
 	var Context = null
+	var connected = require('./connected.js')
 	var Bindable = connected.Bindable
 
 	var concise = new Concise()
@@ -56,11 +56,11 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 	})
 
 
-	/*
-
-	Concise Classes
-
-	*/
+	/**
+	 *
+	 * Concise Classes
+	 *
+	 */
 
 	function Concise(){
 
@@ -120,6 +120,7 @@ http://inimino.org/~inimino/blog/javascript_semicolons
 
 
 	function Controller(name /*, constructor */){
+		console.log(this)
 
 		this._id = name || Math.random().toString().split('.')[1]
 		// this.parent = concise

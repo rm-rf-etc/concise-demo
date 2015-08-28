@@ -327,18 +327,16 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
     if (field.name in bindable) {
 
-      fieldManager(function(input_handler, output_handler){
+      var wrap = fieldManager()
 
-        field.addEventListener('input', function(ev){
-          var do_it = function(){ bindable[field.name] = ev.target.value }
-          input_handler( do_it )
-        })
+      field.addEventListener('input', function(ev){
+        var do_it = function(){ bindable[field.name] = ev.target.value }
+        wrap.input( do_it )
+      })
 
-        bindable.bind(bindable, field.name, function(val){
-          var do_it = function(){ field.value = val }
-          output_handler( do_it )
-        })
-
+      bindable.bind(bindable, field.name, function(val){
+        var do_it = function(){ field.value = val }
+        wrap.output( do_it )
       })
 
       field.value = bindable[field.name]
@@ -350,17 +348,18 @@ Semi-colon line terminators are just FUD. If your minifier can't handle this cod
 
   /* Inverts control: Prevents inputs from receiving updates while they are the sender. */
 
-  function fieldManager(receive_handlers){
+  function fieldManager(){
     var _sent_by_me = false
 
-    function input_handler(do_it){
-      _sent_by_me = true
-      do_it()
+    return {
+      "input": function inputManager(do_it){
+        _sent_by_me = true
+        do_it()
+      },
+      "output": function outputManager(do_it){
+        _sent_by_me ? _sent_by_me = false : do_it()
+      }
     }
-    function output_handler(do_it){
-      _sent_by_me ? _sent_by_me = false : do_it()
-    }
-    receive_handlers( input_handler, output_handler )
   }
 
 

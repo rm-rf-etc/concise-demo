@@ -23,6 +23,12 @@ var filter = {
 	}
 }
 
+
+/**
+ * This function is called by the controller constructor.
+ * Simply return an object and Concise creates the view from it.
+ * Here you can also add controller event listeners.
+ */
 module.exports = function(ctrl){
 
 	// var list = ctrl.parent.models.list
@@ -31,28 +37,38 @@ module.exports = function(ctrl){
 	var list = ctrl.models.list
 	var show_when = ctrl.show_when
 
+	// Create the view and attach all the view logic.
 	return {
 		'div.width-12.column':{
+
 			'a.auth-me href="/join" innerHTML="login / register"':0,
 			'h1 innerHTML="To-Do\'s"':0,
+
+			// Include a partial.
 			'div.nav':require('./partials/nav.js'),
+
 			'div.width-6.columns.centered':{
 				'div.list-editor':{
-					'form':function($){
-						formLogic.call(this,$)
-						$.dom = {
+					'form':function(C$){
+						formLogic.call(this,C$)
+						C$.dom = {
 						'input.full-width type="text" name="new-item-field"':this.newItemInput,
 						'input type="submit"':0
 						}
 					}
 				},
-				'ul each(list)':function($,id,item){
-					onEach.call(this,$,id,item)
+
+				// Invoke the each() helper, calling the func on every item in `concise.models.list`.
+				'ul each(list)':function(C$,id,item){
+
+					// Use fn.call() to share `this`, our context object.
+					onEach.call(this,C$,id,item)
 					var ul_parent = this
-					$.dom = {
-					'li':function($){
-						ul_parent.liChild($)
-						$.dom = {
+
+					C$.dom = { // Continue adding child nodes.
+					'li':function(C$){
+						ul_parent.liChild(C$)
+						C$.dom = {
 						'input type="checkbox"':ul_parent.itemCheckbox,
 						'button.delete-this innerHTML="&times;"':ul_parent.itemDelete,
 						'input type="text"':ul_parent.itemInput
@@ -67,23 +83,23 @@ module.exports = function(ctrl){
 
 
 
-	function formLogic($){
+	function formLogic(C$){
 		var new_item_input = null
 
-		$.onSubmit(function(ev){
+		C$.onSubmit(function(ev){
 			ev.preventDefault()
 			list.push({ checked:false, text:new_item_input.value })
 			new_item_input.value = ''
 		})
 
-		this.newItemInput = function($){
-			new_item_input = $.el
+		this.newItemInput = function(C$){
+			new_item_input = C$.el
 		}
 	}
 
 
-	function deleteButton($){
-		$.onClick(function(){
+	function deleteButton(C$){
+		C$.onClick(function(){
 			function removeCompleted(item, idx){
 				if (item.checked) list.splice( list.indexOf(item), 1 )
 				else idx++
@@ -95,42 +111,44 @@ module.exports = function(ctrl){
 	}
 
 
-	function onEach($,id,item){
+	function onEach(C$,id,item){
 
-		this.liChild = function($){
-			$.el.style.display = filter[show_when][item.checked]
+		this.liChild = function(C$){
+			C$.el.style.display = filter[show_when][item.checked]
+
 			item.bind(item,'checked',function(){
-				$.el.style.display = filter[show_when][item.checked]
+				C$.el.style.display = filter[show_when][item.checked]
 			})
 		}
 
-		this.itemCheckbox = function($){
-			$.el.checked = item.checked
+		this.itemCheckbox = function(C$){
+			C$.el.checked = item.checked
 
-			item.bind(item,'checked',function(val){ $.el.checked = item.checked })
+			item.bind(item,'checked',function(val){ C$.el.checked = item.checked })
 
-			$.onClick(function(ev){ item.checked = $.el.checked })
+			C$.onClick(function(ev){ item.checked = C$.el.checked })
 		}
 
-		this.itemDelete = function($){
-			$.onClick(function(){
+		this.itemDelete = function(C$){
+			C$.onClick(function(){
 				if (confirm('Delete this item?')) list.splice( list.indexOf(item), 1 )
 			})
 		}
 
-		this.itemInput = function($){
-			item.fieldManager(function(input_handler, output_handler){
+		this.itemInput = function(C$){
+			var wrap = item.fieldManager()
 
-				$.onInput(function(ev){
-					input_handler(function(){ item.text = $.el.value })
-				})
+			C$.onInput(inputHandler)
+			item.bind(item,'text',outputHandler)
 
-				item.bind(item,'text',function(val){
-					output_handler(function(){ $.el.value = val })
-				})
+			function inputHandler(ev){
+				wrap.input(function(){ item.text = C$.el.value })
+			}
+			function outputHandler(val){
+				wrap.output(function(){ C$.el.value = val })
+			}
 
-			})
-			$.el.value = item.text
+			C$.el.value = item.text
 		}
 
 	}
