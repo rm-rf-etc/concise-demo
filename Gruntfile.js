@@ -1,32 +1,24 @@
-
 /*
  * open http://localhost:3000/ in your browser.
  */
 
-
-var index = require('fs').readFileSync('./public/index.html')
-// var browserSync = require('browser-sync')
-// var browserSyncGrunt = require('grunt-browser-sync')
-
 module.exports = function(grunt){
   'use strict'
-  grunt.loadNpmTasks('grunt-contrib-watch')
-  grunt.loadNpmTasks('grunt-browser-sync')
-  grunt.loadNpmTasks('grunt-browserify')
+  require('load-grunt-tasks')(grunt)
   grunt.initConfig({
     watch:{
       source:{
-        files: ['main.js', 'libs/*', 'ui/*'],
+        files: ['main.js', 'node_modules/concise/**/*.js', 'node_modules/app/**/*.js'],
         tasks: ['browserify']
       },
-      browsersync:{
-        files: ['Gruntfile.js'],
-        tasks: ['default']
-      }
+      // browsersync:{
+      //   files: ['Gruntfile.js'],
+      //   tasks: ['default']
+      // }
     },
     browserify:{
       dev:{
-        src: './main.js',
+        src: './node_modules/app/client/main.js',
         dest: 'public/scripts/bundle.js',
         options:{
           debug: true,
@@ -36,7 +28,7 @@ module.exports = function(grunt){
         }
       },
       release:{
-        src: './main.js',
+        src: './node_modules/app/client/main.js',
         dest: 'public/scripts/bundle.js',
         options:{
           debug: false,
@@ -46,7 +38,7 @@ module.exports = function(grunt){
     },
     browserSync:{
       bsFiles:{
-        src: ['public/scripts/*', 'public/styles/*', 'public/index.html', 'app/*']
+        src: ['public/styles/*', 'public/index.html', 'public/scripts/bundle.js']
       },
       options:{ // open http://localhost:3002/ in your browser.
         open: false,
