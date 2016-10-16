@@ -14,7 +14,6 @@ http://inimino.org/~inimino/blog/javascript_semicolons
  * Here you can also add controller event listeners.
  */
 module.exports = function(ctrl){
-
 	var signup_form_el
 	var signin_form_el
 	var name_$
