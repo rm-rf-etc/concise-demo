@@ -50,7 +50,7 @@ module.exports = function(ctrl){
 			'h1 innerHTML="To-Do\'s"':0,
 
 			// Include a partial.
-			'div.nav':require('app/client/ui/partials/nav'),
+			'div.nav':require('./partials/nav'),
 
 			'div.width-6.columns.centered':{
 				'div.list-editor':{
