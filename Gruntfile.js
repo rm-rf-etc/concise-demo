@@ -8,7 +8,7 @@ module.exports = function(grunt){
   grunt.initConfig({
     watch:{
       source:{
-        files: ['main.js', 'node_modules/concise/**/*.js', 'node_modules/app/**/*.js'],
+        files: ['./app/**/*.js', 'node_modules/concise/**/*.js'],
         tasks: ['browserify']
       },
       // browsersync:{
@@ -18,7 +18,7 @@ module.exports = function(grunt){
     },
     browserify:{
       dev:{
-        src: './node_modules/app/client/main.js',
+        src: './app/client/main.js',
         dest: 'public/scripts/bundle.js',
         options:{
           debug: true,
@@ -28,7 +28,7 @@ module.exports = function(grunt){
         }
       },
       release:{
-        src: './node_modules/app/client/main.js',
+        src: './app/client/main.js',
         dest: 'public/scripts/bundle.js',
         options:{
           debug: false,
@@ -45,7 +45,7 @@ module.exports = function(grunt){
         watchTask: true,
         server:{
           baseDir: './public',
-          middleware: require('app/server/routing')
+          middleware: require('./app/server/routing')
         }
       }
     }
