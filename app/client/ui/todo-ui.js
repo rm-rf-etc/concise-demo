@@ -11,8 +11,6 @@ The only time you EVER need a semi-colon for statement termination:
 
 */
 
-var concise = require('concise')
-
 var filter = {
 	'true': {
 		'true': 'block',
@@ -35,10 +33,7 @@ var filter = {
  * Here you can also add controller event listeners.
  */
 module.exports = function(ctrl){
-
-	// var list = ctrl.parent.models.list
-	// var show_when = ctrl.parent.show_when
-
+	var concise = require('concise')
 	var models = concise.models
 	var show_when = ctrl.show_when
 
@@ -46,11 +41,13 @@ module.exports = function(ctrl){
 	return {
 		'div.width-12.column':{
 
-			'a.auth-me href="/join" innerHTML="login / register"':0,
+			'a.auth-me href="#" innerHTML="login / register"':function(self){
+				self.onClick(function(ev){ ev.preventDefault(); concise.controllers['auth']() })
+			},
 			'h1 innerHTML="To-Do\'s"':0,
 
 			// Include a partial.
-			'div.nav':require('./partials/nav'),
+			'div.nav':require('./partials/nav')(),
 
 			'div.width-6.columns.centered':{
 				'div.list-editor':{

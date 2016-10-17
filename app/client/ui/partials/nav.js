@@ -1,8 +1,17 @@
 
-module.exports = {
-  'div.row':{
-    'button href="/todos" innerHTML="All"':0,
-    'button href="/todos-incomplete" innerHTML="Incomplete"':0,
-    'button href="/todos-complete" innerHTML="Completed"':0,
-  }
+module.exports = function(){
+	var concise = require('concise')
+	return {
+		'div.row':{
+			'button innerHTML="All"':function(self){
+				self.onClick(function(){ concise.controllers['todos-all']() })
+			},
+			'button innerHTML="Incomplete"':function(self){
+				self.onClick(function(){ concise.controllers['todos-incomplete']() })
+			},
+			'button innerHTML="Completed"':function(self){
+				self.onClick(function(){ concise.controllers['todos-completed']() })
+			},
+		}
+	}
 }

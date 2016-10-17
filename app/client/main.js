@@ -13,14 +13,17 @@ The only time you EVER need a semi-colon for statement termination:
 
 ;(function(){
 	var concise = require('concise')
-	concise.viewParent = document.body
-	// window.concise = concise // For use in debugging.
+	concise.viewParent = document.querySelector('#concise-app')
 
-	new concise.Model('list',[])
-
-	concise.get('/data/todos.json',function(data){
-		concise.models.list = data
-	})
+	new concise.Model('list',[
+		{ "checked":false, "text":"buy almond milk" }
+	,	{ "checked":false, "text":"breakup with Katey" }
+	,	{ "checked":false, "text":"schedule dentist appointment" }
+	,	{ "checked":true,  "text":"end world hunger" }
+	,	{ "checked":false, "text":"go to swimming lessons" }
+	,	{ "checked":true,  "text":"get my haircut" }
+	,	{ "checked":false, "text":"enter the super duper sweetstakes" }
+	])
 
 	var appViews = {
 		todosComponent: require('./ui/todo-ui.js'),
@@ -30,33 +33,28 @@ The only time you EVER need a semi-colon for statement termination:
 
 	/*
 	Controllers
-
 	The router runs the ctrl function upon route change.
 	*/
 
-	var todosAll = new concise.Controller('todo-all', function(){
+	var todosAll = new concise.Controller('todos-all', function(){
+		this.show_when = undefined
 		this.view = appViews.todosComponent
 	})
 
-	var todosDone = new concise.Controller('todo-complete', function(){
+	var todosCompleted = new concise.Controller('todos-completed', function(){
 		this.show_when = true
 		this.view = appViews.todosComponent
 	})
 
-	var todosIncomplete = new concise.Controller('todo-incomplete', function(){
+	var todosIncomplete = new concise.Controller('todos-incomplete', function(){
 		this.show_when = false
 		this.view = appViews.todosComponent
 	})
 
-	var home = new concise.Controller('home', function(){
+	var auth = new concise.Controller('auth', function(){
 		this.view = appViews.authComponent
 	})
 
-	concise.routes
-	('/', home)
-	('/join', home)
-	('/todos', todosAll)
-	('/todos-complete', todosDone)
-	('/todos-incomplete', todosIncomplete)
+	todosAll()
 
 })()

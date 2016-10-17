@@ -22,6 +22,7 @@ module.exports = function(ctrl){
 	var pass_conf_$
 	var test_name
 	var test_pass
+	var concise = require('concise')
 
 	// The 'active' event happens when the user navigates to the route for the controller.
 	ctrl.onActive(function(){
@@ -34,7 +35,9 @@ module.exports = function(ctrl){
 	// Create the view and attach all the view logic.
 	return {
 		"div.width-12.column":{
-			'a.auth-me href="/todos" innerHTML="skip login"':0,
+			'a.auth-me href="#" innerHTML="skip login"':function(self){
+				self.onClick(function(ev){ ev.preventDefault(); concise.controllers['todos-all']() })
+			},
 			'h1 innerHTML="Welcome"':0,
 			'div.width-6.centered':{
 				"form 1 validate":function(C$){
