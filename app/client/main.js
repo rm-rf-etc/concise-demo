@@ -57,4 +57,6 @@ The only time you EVER need a semi-colon for statement termination:
 	('/todos-complete', todosDone)
 	('/todos-incomplete', todosIncomplete)
 
+	concise.hijackAnchors(true)
+
 })()
